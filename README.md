@@ -21,3 +21,4 @@ TODO:
   - Add private messaging
   - Add file transfer support
   - Hyperlinks
+  - Implement locked chatroom requiring a password to login
