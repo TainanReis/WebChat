@@ -1,12 +1,12 @@
 # WebChat
-Easy private webchat with file transfer
+Easy private webchat with file transfer (check version 1st)
 
 How to use:
  - Install the dependencies:
     - install Node.js
     - Open Node.js console and go to the webchat folder
     - run: npm install
-  - Run the index.js: node index.js
+ - Run the index.js: node index.js
 
 I am doing this for my own learning purposes. Since I'm sharing it to whoever may be interested, I commented the code for easy understanding.
 
