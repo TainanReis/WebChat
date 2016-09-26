@@ -25,7 +25,7 @@ $(document).ready(function(){
         $('#message').val('');
     });
     //server communication
-    socket.on('connect', function(data){ //When user first connects
+    socket.on('connect', function(){ //When user first connects
         socket.emit('newConnection', socket.id);
     });
     socket.on('message', function(str){ //receive message
