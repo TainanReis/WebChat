@@ -34,26 +34,24 @@ var getUserId = function(socketId){ //to run the usersArray
 //handling connection
 io.on('connection', function(socket){
     socket.on('message', function(msgObj){
-        var userId = getUserId(msgObj.userId);
+        var userId = getUserId(socket.id);
         console.log('ID ' + userId + ': ' + msgObj.message);
         socket.broadcast.emit('message', userId + ': ' + msgObj.message);
     });
-    socket.on('newConnection', function(data){ //when new connection
-        usersArray.push(data); //add new user to users array
-        var userId = getUserId(data);
+    socket.on('newConnection', function(data, userId){ //when new connection
+        usersArray.push(socket.id); //add new user to users array
+        var userId = getUserId(socket.id);
         console.log(userId + ' has connected');
         socket.broadcast.emit('message', userId + ' connected')
     });
     socket.on('disconnect', function(){ //when user disconnects
-        var socketId = socket.id;
-        var userId = getUserId(socketId.slice(2)); //when socket is disconnected _
-        //socket.io adds /# to the beggining of socket.id _
-        //that's why I take it out
+        var userId = getUserId(socket.id);
         console.log(userId + ' has Disconnected');
         io.emit('message', userId + ' disconnected');
     });
-    socket.on('test', function(str){
-        io.to('/#' + usersArray[1]).emit('message', str); //needs to append /#
+    socket.on('privateMessage', function(msgObj){
+        var userId = getUserId(socket.id);
+        io.to(usersArray[msgObj.sendTo]).emit('message', userId + ': ' + msgObj.message);
     });
 });
 

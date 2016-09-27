@@ -11,7 +11,7 @@ How to use:
 I am doing this for my own learning purposes. Since I'm sharing it to whoever may be interested, I commented the code for easy understanding.
 
 TODO:
-    - Allow the user to run functions using "\", ex.: \nickname John Doe
+    .- Allow the user to run functions using "\", ex.: \nickname John Doe
     - Add support for nicknames
     .- Don’t send the same message to the user that sent it himself. Instead, append the message directly as soon as he presses enter.
     - Add “{user} is typing” functionality
@@ -21,3 +21,7 @@ TODO:
     - Hyperlinks
     - Implement locked chatroom requiring a password to login
     - Format HTML for better look
+Version notes:
+    - As you may have guessed, this is not ready for use (V0.2.0).
+    - To send a private message: \to user message. Where nessage is the user allocation
+    on the usersArray. I'll implement support to Nicknames, so what we have is only for tests.
