@@ -11,7 +11,6 @@ How to use:
 I am doing this for my own learning purposes. Since I'm sharing it to whoever may be interested, I commented the code for easy understanding.
 
 TODO:
-    - Change the $().click() to .keyup()
     - Allow the user to run functions using "\", ex.: \nickname John Doe
     - Add support for nicknames
     - Don’t send the same message to the user that sent it himself. Instead, append the message directly as soon as he presses enter.
