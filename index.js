@@ -36,20 +36,24 @@ io.on('connection', function(socket){
     socket.on('message', function(msgObj){
         var userId = getUserId(msgObj.userId);
         console.log('ID ' + userId + ': ' + msgObj.message);
-        io.emit('message', userId + ': ' + msgObj.message);
+        socket.broadcast.emit('message', userId + ': ' + msgObj.message);
     });
     socket.on('newConnection', function(data){ //when new connection
         usersArray.push(data); //add new user to users array
         var userId = getUserId(data);
         console.log(userId + ' has connected');
-        io.emit('message', userId + ' connected')
+        socket.broadcast.emit('message', userId + ' connected')
     });
     socket.on('disconnect', function(){ //when user disconnects
         var socketId = socket.id;
         var userId = getUserId(socketId.slice(2)); //when socket is disconnected _
-        //socket.io adds /# to the beggining of socket.id
+        //socket.io adds /# to the beggining of socket.id _
+        //that's why I take it out
         console.log(userId + ' has Disconnected');
         io.emit('message', userId + ' disconnected');
+    });
+    socket.on('test', function(str){
+        io.to('/#' + usersArray[1]).emit('message', str); //needs to append /#
     });
 });
 

@@ -13,10 +13,10 @@ I am doing this for my own learning purposes. Since I'm sharing it to whoever ma
 TODO:
     - Allow the user to run functions using "\", ex.: \nickname John Doe
     - Add support for nicknames
-    - Don’t send the same message to the user that sent it himself. Instead, append the message directly as soon as he presses enter.
+    .- Don’t send the same message to the user that sent it himself. Instead, append the message directly as soon as he presses enter.
     - Add “{user} is typing” functionality
     - Show who’s online
-    - Add private messaging
+    .- Add private messaging
     - Add file transfer support
     - Hyperlinks
     - Implement locked chatroom requiring a password to login

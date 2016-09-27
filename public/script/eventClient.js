@@ -25,6 +25,7 @@ $(document).ready(function(){
             var msg = $('#message').val().slice(0,-1); //takes out the enter_char @the_end
             var msgChar = msg.length;
             if(msgChar !== 0){
+                clientObj.toUser('You: ' + msg);
                 clientObj.fromUser(msg);
             }
             $('#message').val(''); //clear the text_box _
@@ -34,10 +35,15 @@ $(document).ready(function(){
     });
     //server communication
     socket.on('connect', function(){ //When user first connects
-        socket.emit('newConnection', socket.id);
+        clientObj.toUser('Connected'); //the user sees this message
+        socket.emit('newConnection', socket.id); //goes to server to broadcast _
+        //to the others
     });
     socket.on('message', function(str){ //receive message
         clientObj.toUser(str);
+    });
+    $('#test-button').click(function(){
+        socket.emit('test', 'Private message');
     });
     
 })
