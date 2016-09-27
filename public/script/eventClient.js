@@ -19,13 +19,21 @@ $(document).ready(function(){
     var socket = (function(){ //left on function in case of need to add something more
         return io();
     })();
-    //the click event
-    $('#send-message').click(function(){ //user sends a message
-        clientObj.fromUser($('#message').val());
-        $('#message').val('');
+    //the keyup event
+    $('#message').keyup(function(keyVal){ //user sends a message by pressing up enter_key
+        if(keyVal.which == 13){
+            var msg = $('#message').val().slice(0,-1); //takes out the enter_char @the_end
+            var msgChar = msg.length;
+            if(msgChar !== 0){
+                clientObj.fromUser(msg);
+            }
+            $('#message').val(''); //clear the text_box _
+            //_ Enter counts as char. If not cleared in the 1st keyup it could _
+            // be sent on the 2nd
+        }
     });
     //server communication
-    socket.on('connect', function(){ //when user first connects
+    socket.on('connect', function(){ //When user first connects
         socket.emit('newConnection', socket.id);
     });
     socket.on('message', function(str){ //receive message
