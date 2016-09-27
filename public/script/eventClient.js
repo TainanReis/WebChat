@@ -25,11 +25,12 @@ $(document).ready(function(){
         commandList: function(commandArray, msg){
             switch(commandArray[0]){
                 case '\\to':
+                    //takes the total length of command+code
                     var commandLength = commandArray[0].length + commandArray[1].length;
                     var msgObj = {
-                        message: msg.slice(commandLength+2), // two spaces _
+                        message: msg.slice(commandLength+2), // +two spaces _
                     //_ between [0]&[1] and [1]&[2]
-                        sendTo: commandArray[1]
+                        sendTo: commandArray[1] //[1] = user
                     };
                     clientObj.toUser('You: ' + msgObj.message);
                     socket.emit('privateMessage', msgObj);
@@ -66,8 +67,8 @@ $(document).ready(function(){
     socket.on('message', function(str){ //receive message
         clientObj.toUser(str);
     });
-    $('#test-button').click(function(){
+    /*$('#test-button').click(function(){
         socket.emit('privateMessage', 'Private message');
-    });
+    });*/
     
 })

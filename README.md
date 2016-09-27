@@ -10,13 +10,16 @@ How to use:
 
 I am doing this for my own learning purposes. Since I'm sharing it to whoever may be interested, I commented the code for easy understanding.
 
-TODO:
-    .- Allow the user to run functions using "\", ex.: \nickname John Doe
+TODO (not organized):
+    - Add functions to the command list
+    - lock the private message so the user don't need to type "\to username" on sequential
+    private messages to the same user. Maybe an extra funtionality like "\to_lock" and
+    "to_unlock"
     - Add support for nicknames
-    .- Don’t send the same message to the user that sent it himself. Instead, append the message directly as soon as he presses enter.
     - Add “{user} is typing” functionality
+    - Show something when everybody received a message and something different when not
+    everyone received the message
     - Show who’s online
-    .- Add private messaging
     - Add file transfer support
     - Hyperlinks
     - Implement locked chatroom requiring a password to login
@@ -24,4 +27,10 @@ TODO:
 Version notes:
     - As you may have guessed, this is not ready for use (V0.2.0).
     - To send a private message: \to user message. Where nessage is the user allocation
-    on the usersArray. I'll implement support to Nicknames, so what we have is only for tests.
+    on the usersArray. Example:
+        - 1 has connected
+        - This user position on usersArray=0
+        - 2 has connected
+        - This user position on usersArray=1
+        - user 2 to send a message to user one: \to 0 Message from user 2 to user 1
+    I'll implement support to Nicknames, so what we have is only for tests/get the structure ready.
