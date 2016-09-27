@@ -33,23 +33,24 @@ var getUserId = function(socketId){ //to run the usersArray
 
 //handling connection
 io.on('connection', function(socket){
+    function userId(){
+        return getUserId(socket.id);
+    }
     socket.on('message', function(msgObj){
-        var userId = getUserId(msgObj.userId);
-        console.log('ID ' + userId + ': ' + msgObj.message);
-        io.emit('message', userId + ': ' + msgObj.message);
+        console.log('ID ' + userId() + ': ' + msgObj.message);
+        socket.broadcast.emit('message', userId() + ': ' + msgObj.message);
     });
     socket.on('newConnection', function(data){ //when new connection
-        usersArray.push(data); //add new user to users array
-        var userId = getUserId(data);
-        console.log(userId + ' has connected');
-        io.emit('message', userId + ' connected')
+        usersArray.push(socket.id); //add new user to users array
+        console.log(userId() + ' has connected');
+        socket.broadcast.emit('message', userId() + ' connected')
     });
     socket.on('disconnect', function(){ //when user disconnects
-        var socketId = socket.id;
-        var userId = getUserId(socketId.slice(2)); //when socket is disconnected _
-        //socket.io adds /# to the beggining of socket.id
-        console.log(userId + ' has Disconnected');
-        io.emit('message', userId + ' disconnected');
+        console.log(userId() + ' has Disconnected');
+        io.emit('message', userId() + ' disconnected');
+    });
+    socket.on('privateMessage', function(msgObj){
+        io.to(usersArray[msgObj.sendTo]).emit('message', userId() + ': ' + msgObj.message);
     });
 });
 
