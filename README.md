@@ -9,13 +9,13 @@ How to use:
  - Run the index.js: node index.js
  - Users get an ID when connected
  - Send messages pressing Enter:
-    - With \ as 1st char it will look for a command
+    - With "\" as the 1st char it will look for a command
     - \to userId sends a message to this user, ex.: \to 2 cool!
     - \track highlights all your messages.
     - \track userId highlights all it's messages
     - \track-off clear highlights
 
-I am doing this for my own learning purposes. Since I'm sharing it to whoever may be interested, I commented the code for easy understanding.
+I am doing this for my own learning purposes. Since I'm sharing it to whoever may be interested, I commented the code to easy understanding.
 
 TODO (not organized):
  - lock the private message so the user don't need to type "\to username" on sequential
@@ -33,4 +33,4 @@ TODO (not organized):
  
 Version notes V0.3.0:
  - Some HTML changes
- - Implemented track command. It highlights all messages from a specific user or own.
+ - Implemented track command. It highlights all messages from a specific user or his own.
