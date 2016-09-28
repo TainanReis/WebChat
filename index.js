@@ -30,6 +30,9 @@ var getUserId = function(socketId){ //to run the usersArray
             }
         }
 };
+function getSocketById(userId){ //this function is for when I have nicknames working
+    return usersArray[userId-1];
+}
 
 //handling connection
 io.on('connection', function(socket){
@@ -50,7 +53,7 @@ io.on('connection', function(socket){
         io.emit('message', '<label class="server-message-bad">' + userId() + ' disconnected' + "</label>");
     });
     socket.on('privateMessage', function(msgObj){
-        io.to(usersArray[msgObj.sendTo]).emit('message', '<label class="pm-receive" name="' + userId() + '">' + userId() + ':</label> ' + msgObj.message);
+        io.to(getSocketById(msgObj.sendTo)).emit('message', '<label class="pm-receive" name="' + userId() + '">' + userId() + ':</label> ' + msgObj.message);
     });
 });
 
