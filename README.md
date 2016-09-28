@@ -25,7 +25,14 @@ TODO (not organized):
  - Implement locked chatroom requiring a password to login
  - Format HTML for better look
  
-Version notes:
+ TODO V0.3.0:
+ HTML:
+    .- Highlight own messages
+    .- Highlight private messages
+    - Highlight tracked user
+ Code:
+    - Implement track user command. It highlights all messages from a specific user
+Previous version notes (important):
  - As you may have guessed, this is not ready for use (V0.2.0).
  - To send a private message: \to user message. Where nessage is the user allocation
  on the usersArray. Example:

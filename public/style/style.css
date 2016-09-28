@@ -27,8 +27,30 @@ ul {
     margin-right: .5%;
     resize: none;
 }
-#send-message {
+#test-button {
     border: none;
     width: 9%;
     position: fixed;
+}
+.server-message-good {
+    color: darkolivegreen;
+    font-size: 11px;
+    padding-left: 20px;
+}
+.server-message-bad {
+    color: firebrick;
+    font-size: 11px;
+    padding-left: 20px;
+}
+.pm-send{
+    color: green;
+    font-weight: bold;
+}
+.pm-receive{
+    color: red;
+    font-weight: bold;
+}
+.normal-msg-userId{
+    color: black;
+    font-weight: bold;
 }

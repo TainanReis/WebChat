@@ -43,14 +43,14 @@ io.on('connection', function(socket){
     socket.on('newConnection', function(data){ //when new connection
         usersArray.push(socket.id); //add new user to users array
         console.log(userId() + ' has connected');
-        socket.broadcast.emit('message', userId() + ' connected')
+        socket.broadcast.emit('message', '<label class="server-message-good">' + userId() + ' connected' + "</label>")
     });
     socket.on('disconnect', function(){ //when user disconnects
         console.log(userId() + ' has Disconnected');
-        io.emit('message', userId() + ' disconnected');
+        io.emit('message', '<label class="server-message-bad">' + userId() + ' disconnected' + "</label>");
     });
     socket.on('privateMessage', function(msgObj){
-        io.to(usersArray[msgObj.sendTo]).emit('message', userId() + ': ' + msgObj.message);
+        io.to(usersArray[msgObj.sendTo]).emit('message', '<label class="pm-receive">' + userId() + ':</label> ' + msgObj.message);
     });
 });
 
