@@ -7,11 +7,17 @@ How to use:
     - Open Node.js console and go to the webchat folder
     - run: npm install
  - Run the index.js: node index.js
+ - Users get an ID when connected
+ - Send messages pressing Enter:
+    - With \ as 1st char it will look for a command
+    - \to userId sends a message to this user, ex.: \to 2 cool!
+    - \track highlights all your messages.
+    - \track userId highlights all it's messages
+    - \track-off clear highlights
 
 I am doing this for my own learning purposes. Since I'm sharing it to whoever may be interested, I commented the code for easy understanding.
 
 TODO (not organized):
- - Add functions to the command list
  - lock the private message so the user don't need to type "\to username" on sequential
  private messages to the same user. Maybe an extra funtionality like "\to_lock" and
  "to_unlock"
@@ -25,20 +31,6 @@ TODO (not organized):
  - Implement locked chatroom requiring a password to login
  - Format HTML for better look
  
- TODO V0.3.0:
- HTML:
-    .- Highlight own messages
-    .- Highlight private messages
-    - Highlight tracked user
- Code:
-    - Implement track user command. It highlights all messages from a specific user
-Previous version notes (important):
- - As you may have guessed, this is not ready for use (V0.2.0).
- - To send a private message: \to user message. Where nessage is the user allocation
- on the usersArray. Example:
-     - 1 has connected
-     - This user position on usersArray=0
-     - 2 has connected
-     - This user position on usersArray=1
-     - user 2 to send a message to user one: \to 0 Message from user 2 to user 1
- I'll implement support to Nicknames, so what we have is only for tests/get the structure ready.
+Version notes V0.3.0:
+ - Some HTML changes
+ - Implemented track command. It highlights all messages from a specific user or own.
