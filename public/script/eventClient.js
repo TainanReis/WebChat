@@ -18,7 +18,7 @@ $(document).ready(function(){
                 // \to user msg > [\to,user,msg] > [1] = user
                 clientObj.commandList(commandArray, msg);
             } else {
-                clientObj.toUser('<label class="normal-msg-userId">You:</label> ' + msg);
+                clientObj.toUser('<label class="normal-msg-userId" name="test-label">You:</label> ' + msg);
                 clientObj.fromUser(msg);
             }
         },
@@ -32,8 +32,22 @@ $(document).ready(function(){
                     //_ between [0]&[1] and [1]&[2]
                         sendTo: commandArray[1] //[1] = user
                     };
-                    clientObj.toUser('<label class="pm-send">You:</label> ' + msgObj.message);
+                    clientObj.toUser('<label class="pm-send" name="own">You:</label> ' + msgObj.message);
                     socket.emit('privateMessage', msgObj);
+                    break;
+                case '\\track':
+                    //creates a node list on messages
+                    var messages = document.getElementsByName("test-label");
+                    for(var i = 0; i < messages.length; i++){
+                        //parses each one adding an attribute (see CSS file)
+                        messages[i].setAttribute("id", "track-on");
+                    }
+                    break;
+                case '\\track-off':
+                    var messages = document.getElementsByName("test-label");
+                    for(var i = 0; i < messages.length; i++){
+                        messages[i].setAttribute("id", "");
+                    }
                     break;
                 default:
                         alert('command not recognized');
