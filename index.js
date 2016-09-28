@@ -38,7 +38,7 @@ io.on('connection', function(socket){
     }
     socket.on('message', function(msgObj){
         console.log('ID ' + userId() + ': ' + msgObj.message);
-        socket.broadcast.emit('message', userId() + ': ' + msgObj.message);
+        socket.broadcast.emit('message', '<label class="normal-msg-received" name="' + userId() + '">' + userId() + ':</label> ' + msgObj.message);
     });
     socket.on('newConnection', function(data){ //when new connection
         usersArray.push(socket.id); //add new user to users array
@@ -50,7 +50,7 @@ io.on('connection', function(socket){
         io.emit('message', '<label class="server-message-bad">' + userId() + ' disconnected' + "</label>");
     });
     socket.on('privateMessage', function(msgObj){
-        io.to(usersArray[msgObj.sendTo]).emit('message', '<label class="pm-receive">' + userId() + ':</label> ' + msgObj.message);
+        io.to(usersArray[msgObj.sendTo]).emit('message', '<label class="pm-receive" name="' + userId() + '">' + userId() + ':</label> ' + msgObj.message);
     });
 });
 
