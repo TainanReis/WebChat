@@ -18,7 +18,7 @@ $(document).ready(function(){
                 // \to user msg > [\to,user,msg] > [1] = user
                 clientObj.commandList(commandArray, msg);
             } else {
-                clientObj.toUser('You: ' + msg);
+                clientObj.toUser('<label class="normal-msg-sent" name="' + socket.id + '">You:</label> ' + msg);
                 clientObj.fromUser(msg);
             }
         },
@@ -32,8 +32,34 @@ $(document).ready(function(){
                     //_ between [0]&[1] and [1]&[2]
                         sendTo: commandArray[1] //[1] = user
                     };
-                    clientObj.toUser('You: ' + msgObj.message);
+                    clientObj.toUser('<label class="pm-send" name="' + socket.id + '">You:</label> ' + msgObj.message);
                     socket.emit('privateMessage', msgObj);
+                    break;
+                case '\\track':
+                    if(!(commandArray[1])){ //if there's no user defined
+                        var messages = document.getElementsByName(socket.id);
+                        for(var i = 0; i < messages.length; i++){
+                            messages[i].setAttribute("id", "track-on");
+                        }
+                    } else {
+                        //creates a node list of the element on messages
+                        var messages = document.getElementsByName(commandArray[1]);
+                        for(var i = 0; i < messages.length; i++){
+                            //parses each one adding an attribute (see CSS file)
+                            messages[i].setAttribute("id", "track-on");
+                        }
+                    }
+                    
+                    break;
+                case '\\track-off':
+                    //from main.html tag <ul> get's all labels inside
+                    var messages = document.getElementById("result").getElementsByTagName("label");
+                    for(var i = 0; i < messages.length; i++){
+                        messages[i].setAttribute("id", "");
+                    }
+                    break;
+                case '\\test':
+                    
                     break;
                 default:
                         alert('command not recognized');
@@ -60,7 +86,7 @@ $(document).ready(function(){
     });
     //server communication
     socket.on('connect', function(){ //When user first connects
-        clientObj.toUser('Connected'); //the user sees this message
+        clientObj.toUser('<label class="server-message-good">Connected</label>'); //the user sees this message
         socket.emit('newConnection'); //goes to server to broadcast _
         //to the others
     });

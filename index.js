@@ -30,6 +30,9 @@ var getUserId = function(socketId){ //to run the usersArray
             }
         }
 };
+function getSocketById(userId){ //this function is for when I have nicknames working
+    return usersArray[userId-1];
+}
 
 //handling connection
 io.on('connection', function(socket){
@@ -38,19 +41,19 @@ io.on('connection', function(socket){
     }
     socket.on('message', function(msgObj){
         console.log('ID ' + userId() + ': ' + msgObj.message);
-        socket.broadcast.emit('message', userId() + ': ' + msgObj.message);
+        socket.broadcast.emit('message', '<label class="normal-msg-received" name="' + userId() + '">' + userId() + ':</label> ' + msgObj.message);
     });
     socket.on('newConnection', function(data){ //when new connection
         usersArray.push(socket.id); //add new user to users array
         console.log(userId() + ' has connected');
-        socket.broadcast.emit('message', userId() + ' connected')
+        socket.broadcast.emit('message', '<label class="server-message-good">' + userId() + ' connected' + "</label>")
     });
     socket.on('disconnect', function(){ //when user disconnects
         console.log(userId() + ' has Disconnected');
-        io.emit('message', userId() + ' disconnected');
+        io.emit('message', '<label class="server-message-bad">' + userId() + ' disconnected' + "</label>");
     });
     socket.on('privateMessage', function(msgObj){
-        io.to(usersArray[msgObj.sendTo]).emit('message', userId() + ': ' + msgObj.message);
+        io.to(getSocketById(msgObj.sendTo)).emit('message', '<label class="pm-receive" name="' + userId() + '">' + userId() + ':</label> ' + msgObj.message);
     });
 });
 

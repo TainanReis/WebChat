@@ -27,8 +27,40 @@ ul {
     margin-right: .5%;
     resize: none;
 }
-#send-message {
+#test-button {
     border: none;
     width: 9%;
     position: fixed;
+}
+.server-message-good {
+    color: darkolivegreen;
+    font-size: 11px;
+    padding-left: 20px;
+}
+.server-message-bad {
+    color: firebrick;
+    font-size: 11px;
+    padding-left: 20px;
+}
+.pm-send{
+    color: green;
+    font-weight: bolder;
+    font-size: 14px;
+}
+.pm-receive{
+    color: red;
+    font-weight: bold;
+}
+.normal-msg-sent{
+    color: black;
+    font-weight: bolder;
+    font-size: 14px;
+}
+.normal-msg-received{
+    /*this the message everybody else receive when someone sends a message*/
+    color: black;
+    font-weight: bold;
+}
+#track-on {
+    background-color: dimgrey;
 }
