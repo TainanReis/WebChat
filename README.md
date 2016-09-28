@@ -17,7 +17,7 @@ TODO (not organized):
     "to_unlock"
     - Add support for nicknames
     - Add “{user} is typing” functionality
-    - Show something when everybody received a message and something different when not
+    -Show something when everybody received a message and something different when not
     everyone received the message
     - Show who’s online
     - Add file transfer support
