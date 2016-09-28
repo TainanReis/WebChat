@@ -24,13 +24,14 @@ TODO (not organized):
  - Hyperlinks
  - Implement locked chatroom requiring a password to login
  - Format HTML for better look
+ 
 Version notes:
-    - As you may have guessed, this is not ready for use (V0.2.0).
-    - To send a private message: \to user message. Where nessage is the user allocation
-    on the usersArray. Example:
-        - 1 has connected
-        - This user position on usersArray=0
-        - 2 has connected
-        - This user position on usersArray=1
-        - user 2 to send a message to user one: \to 0 Message from user 2 to user 1
-    I'll implement support to Nicknames, so what we have is only for tests/get the structure ready.
+ - As you may have guessed, this is not ready for use (V0.2.0).
+ - To send a private message: \to user message. Where nessage is the user allocation
+ on the usersArray. Example:
+     - 1 has connected
+     - This user position on usersArray=0
+     - 2 has connected
+     - This user position on usersArray=1
+     - user 2 to send a message to user one: \to 0 Message from user 2 to user 1
+ I'll implement support to Nicknames, so what we have is only for tests/get the structure ready.
