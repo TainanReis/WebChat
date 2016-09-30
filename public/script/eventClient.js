@@ -58,8 +58,15 @@ $(document).ready(function(){
                         messages[i].setAttribute("id", "");
                     }
                     break;
-                case '\\test':
-                    
+                case '\\test1':
+                    for(var i=0; i<100; i++){
+                        clientObj.toUser('spamming');
+                    }
+                    break;
+                case '\\test2':
+                    alert($('#messageboard').scrollTop());
+                    var scrollSize = $('#messageboard')[0].scrollHeight;
+                    $('#messageboard').animate({ scrollTop: scrollSize },"slow");
                     break;
                 default:
                         alert('command not recognized');
