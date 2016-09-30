@@ -59,7 +59,9 @@ $(document).ready(function(){
                     }
                     break;
                 case '\\test':
-                    
+                    for(var i=0; i<100; i++){
+                        clientObj.toUser('spamming');
+                    }
                     break;
                 default:
                         alert('command not recognized');
