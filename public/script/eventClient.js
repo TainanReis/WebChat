@@ -1,8 +1,15 @@
 /* handles the communication between client-server-client and clientA-clientA */
 $(document).ready(function(){
 
+    function autoScroll(){ //scrolls to the most recent message
+        var scrollSize = $('#messageboard')[0].scrollHeight;
+        $('#messageboard').animate({ scrollTop: scrollSize}, 0);
+    }
     //handles communication between client&user
     var clientObj = {
+        userSettings: {
+            autoScroll: ''
+        },
         fromUser: function(msg){
             var msgObj = {
                 message: msg
@@ -11,6 +18,10 @@ $(document).ready(function(){
         },
         toUser: function(msg){
             $('#result').append('<li>' + msg + '</li>');
+            //check if autoscrolling is enabled
+            if(clientObj.userSettings.autoScroll === 'enabled'){
+                autoScroll();
+            }
         },
         messageHandler: function(msg){
             if(msg.slice(0,1) === '\\'){
@@ -58,15 +69,20 @@ $(document).ready(function(){
                         messages[i].setAttribute("id", "");
                     }
                     break;
+                case '\\scroll':
+                    clientObj.userSettings.autoScroll = 'enabled';
+                    autoScroll();
+                    break;
+                case '\\scroll-off':
+                    clientObj.userSettings.autoScroll = '';
+                    break;
                 case '\\test1':
                     for(var i=0; i<100; i++){
                         clientObj.toUser('spamming');
                     }
                     break;
                 case '\\test2':
-                    alert($('#messageboard').scrollTop());
-                    var scrollSize = $('#messageboard')[0].scrollHeight;
-                    $('#messageboard').animate({ scrollTop: scrollSize },"slow");
+                    
                     break;
                 default:
                         alert('command not recognized');
