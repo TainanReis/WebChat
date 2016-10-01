@@ -34,6 +34,7 @@ TODO V0.4.0:
     - fix functions
         - to-fix
         - track-fix
+        - autoscroll
     - autocomplete
  
 Version notes V0.3.0:

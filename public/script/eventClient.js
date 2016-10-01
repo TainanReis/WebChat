@@ -37,14 +37,22 @@ $(document).ready(function(){
             switch(commandArray[0]){
                 case '\\to':
                     //takes the total length of command+code
-                    var commandLength = commandArray[0].length + commandArray[1].length;
-                    var msgObj = {
+                    if(!!(commandArray[1]) && !!(commandArray[2])){
+                    //if there's a user and a message (not null)
+                        var commandLength = commandArray[0].length + commandArray[1].length;
+                        var msgObj = {
                         message: msg.slice(commandLength+2), // +two spaces _
-                    //_ between [0]&[1] and [1]&[2]
+                        //_ between [0]&[1] and [1]&[2]
                         sendTo: commandArray[1] //[1] = user
                     };
                     clientObj.toUser('<label class="pm-send" name="' + socket.id + '">You:</label> ' + msgObj.message);
                     socket.emit('privateMessage', msgObj);
+                    }
+                    
+                    break;
+                case '\\to-fix':
+                    //sends the messages to this user
+                    //alert(commandArray[2].length);
                     break;
                 case '\\track':
                     if(!(commandArray[1])){ //if there's no user defined

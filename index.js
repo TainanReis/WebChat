@@ -53,7 +53,14 @@ io.on('connection', function(socket){
         io.emit('message', '<label class="server-message-bad">' + userId() + ' disconnected' + "</label>");
     });
     socket.on('privateMessage', function(msgObj){
-        io.to(getSocketById(msgObj.sendTo)).emit('message', '<label class="pm-receive" name="' + userId() + '">' + userId() + ':</label> ' + msgObj.message);
+        if(!getSocketById(msgObj.sendTo)){
+        //if the user is not found, gives error message
+        //I'll associate user ID/name to the socket when implement nicknames _
+        //so now, when a user disconnects he still on the array
+            io.to(socket.id).emit('message', '<label class="server-message-bad">User (' + msgObj.sendTo + ') not found');
+        } else {
+            io.to(getSocketById(msgObj.sendTo)).emit('message', '<label class="pm-receive" name="' + userId() + '">' + userId() + ':</label> ' + msgObj.message);
+        }
     });
 });
 
