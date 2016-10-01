@@ -24,13 +24,17 @@ ul {
     height: 100%; 
     top: 0;
 }
-
 /*user input*/
 .panel.panel-default.user-input{
     position: fixed;
     bottom: 0;
     width: 100%;
     height: 10%;
+}
+#test-div-label {
+    border: 0;
+    height: 5%;
+    top: 0;
 }
 .panel.panel-default.user-input .panel-body{
     width: 100%;
