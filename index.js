@@ -45,7 +45,7 @@ io.on('connection', function(socket){
         //if the user is not found, gives error message
         //I'll associate user ID/name to the socket when implement nicknames _
         //so now, when a user disconnects he remains on the array
-            io.to(socket.id).emit('message', '<label class="server-message-bad">User (' + user + ') not found');
+            io.to(socket.id).emit('message', '<label class="server-message-bad">User (' + user + ') doesn\'t exist or is not online');
         } else {
             return true;
         }
@@ -70,9 +70,18 @@ io.on('connection', function(socket){
     });
     socket.on('confirmUser', function(functionObj){
         if(confirmUser(functionObj.user) === true){
+            functionObj.serverAnswer = true;
             io.to(socket.id).emit('confirmedUser', functionObj);
             //now that the user is confirmed, it returns the obj to the client so it can complete_
             //_ the request
+        } else {
+            functionObj.serverAnswer = false;
+            //parses a new object value (false) cause needed like it is on \track username
+            //on this specific case (track) we send to the server a request to confirm username _
+            //_ and we  receive an answer somewhere on the client. Instead of creating a new socket.on @client or _
+            //_ adding a new property for specific functionObj.functionType, we automate it so all the _
+            //_ remaining cases are left to the client.
+            io.to(socket.id).emit('confirmedUser', functionObj);
         }
     });
 });
