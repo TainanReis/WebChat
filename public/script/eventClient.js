@@ -39,6 +39,7 @@ $(document).ready(function(){
                 clientObj.commandList(commandArray, msg);
             } else {
                 if(clientObj.userSettings.toFix.length > 0){
+                    //if there's a to-fix user defined
                     var msgObj = {
                         message: msg,
                         sendTo: clientObj.userSettings.toFix
@@ -46,6 +47,7 @@ $(document).ready(function(){
                     clientObj.toUser('<label class="pm-send" name="' + socket.id + '">You:</label> ' + msgObj.message);
                     socket.emit('privateMessage', msgObj);
                 } else {
+                    //if it's a normal message
                     clientObj.toUser('<label class="normal-msg-sent" name="' + socket.id + '">You:</label> ' + msg);
                     clientObj.fromUser(msg);   
                 }
