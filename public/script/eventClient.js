@@ -84,13 +84,7 @@ $(document).ready(function(){
                     //sends the messages to this user
                     if(commandArray[1]){
                     //if user is defined
-                        if(clientObj.userSettings.toFix.length > 0){
-                        //if there's already a toFix user defined
-                            var labels = document.getElementById("enabled-options").getElementsByClassName("to-fix");
-                            for(var i = 0; i < labels.length; i++){
-                                labels[i].parentElement.removeChild(labels[i]);
-                            }
-                        }
+                        
                         var functionObj = {
                             user: commandArray[1],
                             functionType: 'to-fix'
@@ -190,9 +184,15 @@ $(document).ready(function(){
     socket.on('confirmedUser', function(functionObj){
         switch(functionObj.functionType){
             case 'to-fix':
+                var labels = document.getElementById("enabled-options").getElementsByClassName("to-fix");
+                for(var i = 0; i < labels.length; i++){
+                    labels[i].parentElement.removeChild(labels[i]);
+                }
                 if(functionObj.serverAnswer === true){
                     clientObj.userSettings.toFix = functionObj.user;
                     clientObj.appendEnabledOptions(functionObj);
+                } else {
+                    clientObj.userSettings.toFix = '';
                 }
                 break;
             case 'track':
