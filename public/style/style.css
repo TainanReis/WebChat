@@ -31,7 +31,7 @@ ul {
     width: 100%;
     height: 10%;
 }
-#test-div-label {
+#enabled-options {
     border: 0;
     height: 5%;
     top: 0;
@@ -40,17 +40,22 @@ ul {
     width: 100%;
     height: 100%;
 }
+#test-div-label {
+    border: 0;
+    height: 5%;
+    top: 0;
+}
 #message {
     border: 0;
     width: 90%;
-    height: 100%;
+    height: 90%;
     margin-right: .5%;
     resize: none;
 }
 #test-button {
     border: none;
     width: 9%;
-    position: fixed;
+    /* position: fixed; */
 }
 .server-message-good {
     color: darkolivegreen;
