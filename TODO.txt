@@ -1,0 +1,6 @@
+- Create functions for similar code
+    - check the functions step-by-step
+    - check all the DOM manipulation and HTML tags
+    - check the comments
+        - check if there's something that need to have a comment
+        - check if there's some comment that have to be taken off
