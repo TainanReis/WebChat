@@ -7,8 +7,8 @@ var path = require('path');
 //socket.IO
 //it parses the http object
 var io = require('socket.io')(http);
-//to store users info
-var usersArray = [];
+
+var usersArray = []; //to store users info
 
 //----- references
 //allow the css file reference
@@ -26,7 +26,7 @@ app.get('/', function(req, res){
 var getUserId = function(socketId){ //to run the usersArray
     for(var i in usersArray){
             if (usersArray[i] == socketId){
-                return ++i; //Return user position @array AKA userId
+                return ++i; //Return user position @theArray AKA userId
             }
         }
 };
@@ -35,7 +35,7 @@ function getSocketById(userId){ //this function is for when I have nicknames wor
 }
 function labelObj (type, classVar, id, message){
 //Creates a new labelObj to be sent back to the client.
-//This is because the labels are set in only one place (compare to V0.3.0, for example)
+//This is because the label's html code is set in only one place (compare to V0.3.0, for example)
     this.labelType = type; //the type of label
     this.classVar = classVar;
     this.id = id;
@@ -65,7 +65,7 @@ io.on('connection', function(socket){
     });
     socket.on('newConnection', function(data){ //when new connection
         usersArray.push(socket.id); //add new user to users array
-        console.log(userId() + ' has connected');
+        console.log(userId() + ' connected');
         var label = new labelObj('system', 'server-message-good', userId(), 'connected');
         socket.broadcast.emit('message', label);
     });

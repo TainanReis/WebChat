@@ -13,7 +13,7 @@ $(document).ready(function(){
             track: ''
         },
         fromUser: function(msg){
-            var msgObj = {
+            var msgObj = { //I'll let this open
                 message: msg
             };
             socket.emit('message', msgObj); //send to server
@@ -23,13 +23,6 @@ $(document).ready(function(){
             //check if autoscrolling is enabled
             if(clientObj.userSettings.autoScroll === 'enabled'){
                 autoScroll();
-            }
-            if(clientObj.userSettings.track.length > 0){
-                var messages = document.getElementsByName(clientObj.userSettings.track);
-                for(var i = 0; i < messages.length; i++){
-                //parses each one adding an attribute (see CSS file)
-                    messages[i].setAttribute("id", "track-on");
-                }
             }
         },
         labelParser: function(type, classVar, id, message){
@@ -44,10 +37,17 @@ $(document).ready(function(){
                     break;
                 case 'received':
                 //<label class="" name="">user:</label> message
-                    label = '<label class="' + classVar + 
+                    if(id == clientObj.userSettings.track){
+                        label = '<label class="' + classVar + 
+                            '" name ="' + id + 
+                            '" id="track-on">' + id + 
+                            ':</label> ' + message;
+                    } else {
+                        label = '<label class="' + classVar + 
                             '" name ="' + id + 
                             '">' + id + 
                             ':</label> ' + message;
+                    }
                     break;
                 case 'system':
                     label = '<label class="' + classVar +
@@ -60,7 +60,7 @@ $(document).ready(function(){
             clientObj.toUser(label);
         },
         appendEnabledOptions: function(functionObj){
-            //appends a label with the enabled functions
+            //appends a label with the enabled function
             $('#enabled-options').append('<label class="' + 
                                          functionObj.functionType + '">' + 
                                          functionObj.functionType + ': ' + 
@@ -69,8 +69,9 @@ $(document).ready(function(){
         },
         messageHandler: function(msg){
             if(msg.slice(0,1) === '\\'){
-                var commandArray = msg.split(' ');// example: _
-                // \to user msg > [\to,user,msg] > [1] = user
+            //if it's a command. "\" as the first char
+                var commandArray = msg.split(' ');
+                // example: \to user msg > [\to,user,msg] > [1] = user ... [0] = \to
                 clientObj.commandList(commandArray, msg);
             } else {
                 if(clientObj.userSettings.toFix.length > 0){
@@ -91,13 +92,14 @@ $(document).ready(function(){
         commandList: function(commandArray, msg){
             switch(commandArray[0]){
                 case '\\to':
-                    //takes the total length of command+code
                     if(commandArray[1] && commandArray[2]){
-                    //if there's a user and a message (not null)
+                    //if there's a user and a message
                         var commandLength = commandArray[0].length + commandArray[1].length;
+                        //takes the total length of command+userId
                         var msgObj = {
-                            message: msg.slice(commandLength+2), // +two spaces _
-                            //_ between [0]&[1] and [1]&[2]
+                            message: msg.slice(commandLength+2),
+                            //takes out the command and username + two spaces _
+                            //_ between [0]&[1] and [1]&[2]. So it leaves only the message 
                             sendTo: commandArray[1] //[1] = user
                         };
                         //***IMPORTANT
@@ -108,7 +110,7 @@ $(document).ready(function(){
                     
                     break;
                 case '\\to-fix':
-                    //sends the messages to this user
+                    //sends the messages to a defined user
                     if(commandArray[1]){
                     //if user is defined
                         
@@ -132,10 +134,8 @@ $(document).ready(function(){
                     clientObj.userSettings.toFix = '';
                     break;
                 case '\\track':
-                    //!IMPORTANT (todo)
-                    //later on when improving the code, implement a run to track-off before tracking another user
                     if(!(commandArray[1])){ //if there's no user defined
-                    //it allows the user to track his sent messages and keep tracking some other user
+                    //it allows the user to highlight his sent messages
                         var messages = document.getElementsByName(socket.id);
                         for(var i = 0; i < messages.length; i++){
                             messages[i].setAttribute("id", "track-on");
@@ -150,11 +150,12 @@ $(document).ready(function(){
                     
                     break;
                 case '\\track-off':
-                    //from main.html tag <ul> get's all labels inside
+                    //clears highlights
                     var messages = document.getElementById("result").getElementsByTagName("label");
                     for(var i = 0; i < messages.length; i++){
                         messages[i].setAttribute("id", "");
                     }
+                    //takes the enabled option label out
                     var labels = document.getElementById("enabled-options").getElementsByClassName("track");
                             for(var i = 0; i < labels.length; i++){
                                 labels[i].parentElement.removeChild(labels[i]);
@@ -169,12 +170,10 @@ $(document).ready(function(){
                     clientObj.userSettings.autoScroll = '';
                     break;
                 case '\\test1':
+                    //to test autoscroll
                     for(var i=0; i<100; i++){
                         clientObj.toUser('spamming');
                     }
-                    break;
-                case '\\test2':
-                    
                     break;
                 default:
                         alert('command not recognized');
@@ -183,7 +182,7 @@ $(document).ready(function(){
     };
 
     //start the socket
-    var socket = (function(){ //left on function in case of need to add something more
+    var socket = (function(){ //left in a function in case of need to add something else
         return io();
     })();
     //the keyup event
@@ -194,16 +193,18 @@ $(document).ready(function(){
             if(msgChar !== 0){
                 clientObj.messageHandler(msg);
             }
-            $('#message').val(''); //clear the text_box _
-            //_ Enter counts as char. If not cleared in the 1st keyup it could _
+            $('#message').val('');
+            //clears the text_box.
+            //The Enter_key counts as a char.
+            // If not cleared in the 1st keyup it could _
             // be sent on the 2nd
         }
     });
     //server communication
     socket.on('connect', function(){ //When user first connects
         clientObj.labelParser('system', 'server-message-good', '', 'Connected');
-        socket.emit('newConnection'); //goes to server to broadcast _
-        //to the others
+        socket.emit('newConnection');//goes to the server to broadcast _
+        //_ to the others
     });
     socket.on('message', function(obj){ //receive message
         clientObj.labelParser(obj.labelType, obj.classVar, obj.id, obj.message);
@@ -228,15 +229,15 @@ $(document).ready(function(){
                         messages[i].setAttribute("id", "");
                     }
                 //if there's already a track user defined, removes the label
-                    var labels = document.getElementById("enabled-options").getElementsByClassName("track");
-                    for(var i = 0; i < labels.length; i++){
-                        labels[i].parentElement.removeChild(labels[i]);
-                    }
+                var labels = document.getElementById("enabled-options").getElementsByClassName("track");
+                for(var i = 0; i < labels.length; i++){
+                    labels[i].parentElement.removeChild(labels[i]);
+                }
                 if(functionObj.serverAnswer === true){
                 //this is different because it only defines a tracking user if he exists. _
                 //if the user logged out we can still track all the messages he sent. By V0.4.0 we don't take _
                 //users out of the array. But this sets the structre for when it'll be implemented.
-                //so, if TRUE tracks also new messages, else it tracks only all the past messages
+                //so, if TRUE, tracks also new messages, else it tracks only all the past messages
                     clientObj.userSettings.track = functionObj.user;
                     //^defines @userSetiings who's being tracked
                     clientObj.appendEnabledOptions(functionObj);
@@ -255,7 +256,7 @@ $(document).ready(function(){
         }
     });
     /*$('#test-button').click(function(){
-        socket.emit('privateMessage', 'Private message');
+        //empty
     });*/
     
 })
