@@ -75,9 +75,9 @@ io.on('connection', function(socket){
         io.emit('message', label);
     });
     socket.on('privateMessage', function(msgObj){
-        if(confirmUser(msgObj.sendTo) === true){
+        if(confirmUser(msgObj.user) === true){
             var label = new labelObj('received', 'pm-receive', userId(), msgObj.message);
-            io.to(getSocketById(msgObj.sendTo)).emit('message', label);
+            io.to(getSocketById(msgObj.user)).emit('message', label);
         }
     });
     socket.on('confirmUser', function(functionObj){

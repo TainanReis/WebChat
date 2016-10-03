@@ -78,7 +78,7 @@ $(document).ready(function(){
                     //if there's a to-fix user defined
                     var msgObj = {
                         message: msg,
-                        sendTo: clientObj.userSettings.toFix
+                        user: clientObj.userSettings.toFix
                     };
                     clientObj.labelParser('sent', 'pm-send', socket.id, msgObj.message);
                     socket.emit('privateMessage', msgObj);
@@ -96,16 +96,16 @@ $(document).ready(function(){
                     //if there's a user and a message
                         var commandLength = commandArray[0].length + commandArray[1].length;
                         //takes the total length of command+userId
-                        var msgObj = {
+                        var functionObj = {
                             message: msg.slice(commandLength+2),
                             //takes out the command and username + two spaces _
                             //_ between [0]&[1] and [1]&[2]. So it leaves only the message 
-                            sendTo: commandArray[1] //[1] = user
+                            user: commandArray[1], //[1] = user
+                            functionType: 'to'
                         };
-                        //***IMPORTANT
-                        //in the future, separate this nex code. [see messagehandler:tofix ]
-                        clientObj.labelParser('sent', 'pm-send', socket.id, msgObj.message);
-                        socket.emit('privateMessage', msgObj);
+                        clientObj.labelParser('sent', 'pm-send', socket.id, functionObj.message);
+                        socket.emit('confirmUser', functionObj);
+                        //appends the message anyway but confirms the user before sending
                     }
                     
                     break;
@@ -113,7 +113,6 @@ $(document).ready(function(){
                     //sends the messages to a defined user
                     if(commandArray[1]){
                     //if user is defined
-                        
                         var functionObj = {
                             user: commandArray[1],
                             functionType: 'to-fix'
@@ -211,11 +210,16 @@ $(document).ready(function(){
     });
     socket.on('confirmedUser', function(functionObj){
         switch(functionObj.functionType){
+            case 'to':
+                if(functionObj.serverAnswer === true){
+                    socket.emit('privateMessage', functionObj);
+                }
+                break;
             case 'to-fix':
                 var labels = document.getElementById("enabled-options").getElementsByClassName("to-fix");
                 for(var i = 0; i < labels.length; i++){
                     labels[i].parentElement.removeChild(labels[i]);
-                }
+                }//removes the label from enabled options
                 if(functionObj.serverAnswer === true){
                     clientObj.userSettings.toFix = functionObj.user;
                     clientObj.appendEnabledOptions(functionObj);
