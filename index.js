@@ -52,7 +52,6 @@ io.on('connection', function(socket){
         //if the user is not found, gives error message
         //I'll associate user ID/name to the socket when implement nicknames _
         //so now, when a user disconnects he remains on the array
-            //io.to(socket.id).emit('message', '<label class="server-message-bad">User (' + user + ') doesn\'t exist or is not online');
             var label = new labelObj('system', 'server-message-bad', '', 'User (' + user + ') doesn\'t exist ot isn\'t online');
             io.to(socket.id).emit('message', label);
         } else {
@@ -61,26 +60,22 @@ io.on('connection', function(socket){
     }
     socket.on('message', function(msgObj){
         console.log('ID ' + userId() + ': ' + msgObj.message);
-        //socket.broadcast.emit('message', '<label class="normal-msg-received" name="' + userId() + '">' + userId() + ':</label> ' + msgObj.message);
         var label = new labelObj('received', 'normal-msg-received', userId(), msgObj.message);
         socket.broadcast.emit('message', label);
     });
     socket.on('newConnection', function(data){ //when new connection
         usersArray.push(socket.id); //add new user to users array
         console.log(userId() + ' has connected');
-        //socket.broadcast.emit('message', '<label class="server-message-good">' + userId() + ' connected' + "</label>")
         var label = new labelObj('system', 'server-message-good', userId(), 'connected');
         socket.broadcast.emit('message', label);
     });
     socket.on('disconnect', function(){ //when user disconnects
         console.log(userId() + ' has Disconnected');
-        //io.emit('message', '<label class="server-message-bad">' + userId() + ' disconnected' + "</label>");
         var label = new labelObj('system', 'server-message-bad', userId(), 'disconnected');
         io.emit('message', label);
     });
     socket.on('privateMessage', function(msgObj){
         if(confirmUser(msgObj.sendTo) === true){
-            //io.to(getSocketById(msgObj.sendTo)).emit('message', '<label class="pm-receive" name="' + userId() + '">' + userId() + ':</label> ' + msgObj.message);
             var label = new labelObj('received', 'pm-receive', userId(), msgObj.message);
             io.to(getSocketById(msgObj.sendTo)).emit('message', label);
         }
