@@ -32,12 +32,38 @@ $(document).ready(function(){
                 }
             }
         },
+        labelParser: function(type, classVar, id, message){
+        //labels that are shown @chat_board
+            var label = '';
+            switch(type){
+                case 'sent':
+                //<label class="" name="">You:</label> message
+                    label = '<label class="' + classVar + 
+                            '" name="' + id + 
+                            '">You:</label> ' + message;
+                    break;
+                case 'received':
+                    label = '<label class="' + classVar + 
+                            '" name ="' + id + 
+                            '">' + id + 
+                            ':</label> ' + message;
+                    break;
+                case 'system':
+                    label = '<label class="' + classVar +
+                            '">' + id + ' ' +
+                            message + '</label>';
+                    break;
+                default:
+                //empty
+            }
+            clientObj.toUser(label);
+        },
         appendEnabledOptions: function(functionObj){
             //appends a label with the enabled functions
             $('#enabled-options').append('<label class="' + 
                                          functionObj.functionType + '">' + 
                                          functionObj.functionType + ': ' + 
-                                         functionObj.user + '</label>'
+                                         functionObj.user + '</label> '
                                         );
         },
         messageHandler: function(msg){
@@ -52,11 +78,13 @@ $(document).ready(function(){
                         message: msg,
                         sendTo: clientObj.userSettings.toFix
                     };
-                    clientObj.toUser('<label class="pm-send" name="' + socket.id + '">You:</label> ' + msgObj.message);
+                    //clientObj.toUser('<label class="pm-send" name="' + socket.id + '">You:</label> ' + msgObj.message);
+                    clientObj.labelParser('sent', 'pm-send', socket.id, msgObj.message);
                     socket.emit('privateMessage', msgObj);
                 } else {
                     //if it's a normal message
-                    clientObj.toUser('<label class="normal-msg-sent" name="' + socket.id + '">You:</label> ' + msg);
+                    //clientObj.toUser('<label class="normal-msg-sent" name="' + socket.id + '">You:</label> ' + msg);
+                    clientObj.labelParser('sent', 'normal-msg-sent', socket.id, msg);
                     clientObj.fromUser(msg);   
                 }
             }
@@ -75,7 +103,8 @@ $(document).ready(function(){
                         };
                         //***IMPORTANT
                         //in the future, separate this nex code. [see messagehandler:tofix ]
-                        clientObj.toUser('<label class="pm-send" name="' + socket.id + '">You:</label> ' + msgObj.message);
+                        //clientObj.toUser('<label class="pm-send" name="' + socket.id + '">You:</label> ' + msgObj.message);
+                        clientObj.labelParser('sent', 'pm-send', socket.id, msgObj.message);
                         socket.emit('privateMessage', msgObj);
                     }
                     
@@ -174,12 +203,14 @@ $(document).ready(function(){
     });
     //server communication
     socket.on('connect', function(){ //When user first connects
-        clientObj.toUser('<label class="server-message-good">Connected</label>'); //the user sees this message
+        //clientObj.toUser('<label class="server-message-good">Connected</label>'); //the user sees this message
+        clientObj.labelParser('system', 'server-message-good', '', 'Connected');
         socket.emit('newConnection'); //goes to server to broadcast _
         //to the others
     });
-    socket.on('message', function(str){ //receive message
-        clientObj.toUser(str);
+    socket.on('message', function(obj){ //receive message
+        //clientObj.toUser(str); //IMPORTANT: check the >obj< being called above!
+        clientObj.labelParser(obj.labelType, obj.classVar, obj.id, obj.message);
     });
     socket.on('confirmedUser', function(functionObj){
         switch(functionObj.functionType){
