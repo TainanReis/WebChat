@@ -59,13 +59,19 @@ $(document).ready(function(){
             }
             clientObj.toUser(label);
         },
-        appendEnabledOptions: function(functionObj){
+        appendEnabledOptions: function(arg1, arg2){
             //appends a label with the enabled function
             $('#enabled-options').append('<label class="' + 
-                                         functionObj.functionType + '">' + 
-                                         functionObj.functionType + ': ' + 
-                                         functionObj.user + '</label> '
+                                         arg1 + '">' + 
+                                         arg1 + ': ' + 
+                                         arg2 + '</label> '
                                         );
+        },
+        removeEnabledOptions: function(option){
+            var labels = document.getElementById("enabled-options").getElementsByClassName(option);
+                for(var i = 0; i < labels.length; i++){
+                    labels[i].parentElement.removeChild(labels[i]);
+                }
         },
         messageHandler: function(msg){
             if(msg.slice(0,1) === '\\'){
@@ -126,10 +132,7 @@ $(document).ready(function(){
                     }
                     break;
                 case '\\to-unfix':
-                    var labels = document.getElementById("enabled-options").getElementsByClassName("to-fix");
-                    for(var i = 0; i < labels.length; i++){
-                        labels[i].parentElement.removeChild(labels[i]);
-                    }
+                    clientObj.removeEnabledOptions('to-fix');
                     clientObj.userSettings.toFix = '';
                     break;
                 case '\\track':
@@ -155,17 +158,16 @@ $(document).ready(function(){
                         messages[i].setAttribute("id", "");
                     }
                     //takes the enabled option label out
-                    var labels = document.getElementById("enabled-options").getElementsByClassName("track");
-                            for(var i = 0; i < labels.length; i++){
-                                labels[i].parentElement.removeChild(labels[i]);
-                            }
+                    clientObj.removeEnabledOptions('track');
                     clientObj.userSettings.track = '';
                     break;
                 case '\\scroll':
                     clientObj.userSettings.autoScroll = 'enabled';
+                    clientObj.appendEnabledOptions('scroll', 'on');
                     autoScroll();
                     break;
                 case '\\scroll-off':
+                    clientObj.removeEnabledOptions('scroll');
                     clientObj.userSettings.autoScroll = '';
                     break;
                 case '\\test1':
@@ -222,7 +224,7 @@ $(document).ready(function(){
                 }//removes the label from enabled options
                 if(functionObj.serverAnswer === true){
                     clientObj.userSettings.toFix = functionObj.user;
-                    clientObj.appendEnabledOptions(functionObj);
+                    clientObj.appendEnabledOptions(functionObj.functionType, functionObj.user);
                 } else {
                     clientObj.userSettings.toFix = '';
                 }
@@ -244,7 +246,7 @@ $(document).ready(function(){
                 //so, if TRUE, tracks also new messages, else it tracks only all the past messages
                     clientObj.userSettings.track = functionObj.user;
                     //^defines @userSetiings who's being tracked
-                    clientObj.appendEnabledOptions(functionObj);
+                    clientObj.appendEnabledOptions(functionObj.functionType, functionObj.user);
                 } else {
                     clientObj.userSettings.track = '';
                 }
