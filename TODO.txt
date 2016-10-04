@@ -1,6 +1,3 @@
-x- Create functions for similar code
-    x- check the functions step-by-step
-    x- check all the DOM manipulation and HTML tags
-    x- check the comments
-        x- check if there's something that need to have a comment
-        x- check if there's some comment that have to be taken off
+AUTOCOMPLETE
+- autocomplete commands as user types
+- use Tab to set the autocomplete
