@@ -1,3 +1,17 @@
 AUTOCOMPLETE
-- autocomplete commands as user types
-- use Tab to set the autocomplete
+-> when TAB is 1st pressed:
+    -> if the 1st char is '\' and selectionStart<=(maxLength word from commandValues):
+    -> stores what the user typed so far using slice(1,selectionStart)
+    -> search for a match 
+    -> store the matches
+    -> adds the first match (plus a space) and stores the new selectionStart and added value
+-> if the user keep pressing tab it will run through all the stored matched,
+including what he typed (that was also stored):
+-> if the current selectionStart=(stored selectionStart) and the current value
+equals the stored last added value:
+    -> takes out slice(1,selectionstart)
+    -> adds the next stored match (plus a space) and stores the new selectionStart
+-> else:
+    -> it starts from the beginning
+-> if the user types any other key, the stored values are cleared and
+when user presses tab again it will restart the process
