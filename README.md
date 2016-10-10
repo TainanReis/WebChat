@@ -11,16 +11,19 @@ How to use:
  - Send messages pressing Enter:
     - With \ as 1st char it will look for a command
     - \to userId sends a message to this user, ex.: \to 2 cool!
+    - \to-fix userId send all messages to this user (\to userId will work when this function is
+    enabled)
+    - \to-unfix disables the function above
     - \track highlights all your messages.
-    - \track userId highlights all it's messages
-    - \track-off clear highlights
+    - \track userId highlights and tracks all it's messages
+    - \track-off clear highlights/disables tracking
+    - \scroll or \scroll-off enables or disables autoscroll
+    - press TAB to autocomplete the commands (don't forget that it will only look for a command if
+    the 1st char is \)
 
 I am doing this for my own learning purposes. Since I'm sharing it to whoever may be interested, I commented the code for easy understanding.
 
 TODO (not organized):
- - lock the private message so the user don't need to type "\to username" on sequential
- private messages to the same user. Maybe an extra funtionality like "\to_lock" and
- "to_unlock"
  - Add support for nicknames
  - Add “{user} is typing” functionality
  -Show something when everybody received a message and something different when not
@@ -30,13 +33,11 @@ TODO (not organized):
  - Hyperlinks
  - Implement locked chatroom requiring a password to login
  - Format HTML for better look
-TODO V0.4.0:
-    - fix functions
-        - to-fix
-        - track-fix
-        - autoscroll
-    - autocomplete
  
-Version notes V0.3.0:
- - Some HTML changes
- - Implemented track command. It highlights all messages from a specific user or own.
+Version notes V0.4.0:
+    - fix functions
+        - \to-fix
+        - \track
+    - autoscroll
+    - autocomplete
+    - code optimization
