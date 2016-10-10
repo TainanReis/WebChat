@@ -351,5 +351,5 @@ $(document).ready(function(){
     /*$('#test-button').click(function(){
         //empty
     });*/
-    
+    clientObj.commandList(['\\scroll'], ''); //enables scroll when page loads
 })
