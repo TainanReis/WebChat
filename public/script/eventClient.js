@@ -213,6 +213,86 @@ $(document).ready(function(){
             // be sent on the 2nd
         }
     });
+    //-- test autocomplete
+    var commandValues = ['\\to-fix', '\\scroll', '\\test'];
+    var commandHighestLength = function(){ //as the name says...
+        var highestLength = 0;
+        for(var i in commandValues){
+            if(commandValues[i].length > highestLength){
+                highestLength = commandValues[i].length;
+            }
+        }
+        return highestLength;
+    };
+    var previousSelectionStart = 0; //we'll use this to detect if the user wants the next match or not
+    var currentArrayPosition = 0; //stores where we are in the matches array
+    var storedCommandMatches, previousTextAfter, previousTextBefore;
+    var newAutoComplete = function(elmId, position){
+        if(position <= commandHighestLength()){
+            var txtBefore = (elmId.value).substring(0, position); //what is before the cursor
+            var txtAfter = (elmId.value).substring(position, elmId.value.length); //what is after the cursor
+            var commandMatches = function(){
+                var matches = [];
+                for(var i in commandValues){
+                    var sliced = commandValues[i].slice(0, position); //to find a match
+                    if(sliced === txtBefore){ //if a match is found
+                        matches.push(commandValues[i]);
+                    }
+                }
+                matches.push(txtBefore);
+                return matches;
+            };
+            if(commandMatches().length > 0){//if theres a match in the array
+                storedCommandMatches = commandMatches();
+                elmId.value = storedCommandMatches[0] + txtAfter;
+                elmId.selectionEnd = storedCommandMatches[0].length;
+                previousSelectionStart = elmId.selectionEnd;
+                previousTextAfter = txtAfter;
+                previousTextBefore = (elmId.value).substring(0, elmId.selectionStart);
+            }
+        }
+    };
+    $('body').keydown(function(keyVal){
+    //if it was keyup/keypress it would first change and only then do the rest
+    //in this case it first parses when the key is pressed and only then _
+    //it does what it's supposed to do.
+        if(keyVal.which == 9 && $('#message').is(':focus')){
+            var elmId = document.getElementById('message');
+            var position = elmId.selectionStart; //gets the input cursor position
+            if(elmId.value.slice(0,1) === '\\'){
+                if(position !== previousSelectionStart){
+                    newAutoComplete(elmId, position);
+                } else {
+                    if(
+                        (elmId.value).substring(0, elmId.selectionStart) === previousTextBefore
+                        &&
+                        (elmId.value).substring(position, elmId.value.length) === previousTextAfter
+                    ){
+                        if(currentArrayPosition < (storedCommandMatches.length-1)){
+                            currentArrayPosition++;
+                            elmId.value = storedCommandMatches[currentArrayPosition] + previousTextAfter;
+                            elmId.selectionEnd = storedCommandMatches[currentArrayPosition].length;
+                            previousSelectionStart = elmId.selectionEnd;
+                            previousTextAfter = (elmId.value).substring(elmId.selectionStart, elmId.value.length);
+                            previousTextBefore = (elmId.value).substring(0, elmId.selectionStart);
+                        } else {
+                            currentArrayPosition = 0;
+                            elmId.value = storedCommandMatches[currentArrayPosition] + previousTextAfter;
+                            elmId.selectionEnd = storedCommandMatches[currentArrayPosition].length;
+                            previousSelectionStart = elmId.selectionEnd;
+                            previousTextAfter = (elmId.value).substring(elmId.selectionStart, elmId.value.length);
+                            previousTextBefore = (elmId.value).substring(0, elmId.selectionStart);
+                        }
+                    } else {
+                        newAutoComplete(elmId, elmId.selectionStart);
+                    }
+                    
+                }
+            keyVal.preventDefault(); //it cancels the default TAB function so it won't change focus
+            }
+        }
+    });
+    //-- end
     //server communication
     socket.on('connect', function(){ //When user first connects
         clientObj.labelParser('system', 'server-message-good', '', 'Connected');
