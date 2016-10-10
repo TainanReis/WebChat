@@ -19,7 +19,7 @@ Easy private webchat with file transfer (check version 1st)
     - `\track-off` clear highlights/disables tracking
     - `\scroll` or `\scroll-off` enables or disables autoscroll
     - press TAB to autocomplete the commands (don't forget that it will only look for a command if
-    the 1st char is \)
+    the 1st char is `\`)
 
 I am doing this for my own learning purposes. Since I'm sharing it to whoever may be interested, I commented the code for easy understanding.
 
