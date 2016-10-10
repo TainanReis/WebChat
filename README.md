@@ -21,7 +21,7 @@ Easy private webchat with file transfer (check version 1st)
     - press TAB to autocomplete the commands (don't forget that it will only look for a command if
     the 1st char is `\`)
 
-I am doing this for my own learning purposes. Since I'm sharing it to whoever may be interested, I commented the code for easy understanding.
+I am doing this for my own learning purposes. Since I'm sharing it to whoever may be interested, I commented the code to easy understanding.
 
 ##TODO (not organized):
  - Add support for nicknames
