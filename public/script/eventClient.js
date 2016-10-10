@@ -113,7 +113,7 @@ $(document).ready(function(){
                 }
             }
         },
-        commandList: function(commandArray, msg){
+        commandList: function(commandArray, msg){ //do not forget to update autocomplete command list
             switch(commandArray[0]){
                 case '\\to':
                     if(commandArray[1] && commandArray[2]){
@@ -193,11 +193,63 @@ $(document).ready(function(){
             }
         }
     };
+    //autoComplete object
+    var autoComplete = {
+        settings: {
+            previousSelectionStart: 0,
+            currentArrayPosition: 0,
+            storedCommandMatches: [],
+            previousTextAfter: '',
+            previousTextBefore: ''
+        },
+        commandValues:
+            ['\\to', '\\to-fix', '\\to-unfix', '\\track', '\\track-off', '\\scroll', '\\scroll-off', '\\test1'],
+        highestLength:
+            function(){ //as the name says...
+                var highestLength = 0;
+                for(var i in autoComplete.commandValues){
+                    if(autoComplete.commandValues[i].length > highestLength){
+                        highestLength = autoComplete.commandValues[i].length;
+                    }
+                }
+                return highestLength;
+            },
+        new: 
+            function(elmId, position){
+                if(position <= autoComplete.highestLength()){
+                    var txtBefore = (elmId.value).substring(0, position); //what is before the cursor
+                    var txtAfter = (elmId.value).substring(position, elmId.value.length); //what is after the cursor
+                    var commandMatches = function(){
+                        var matches = [];
+                        for(var i in autoComplete.commandValues){
+                            var sliced = autoComplete.commandValues[i].slice(0, position); //to find a match
+                            if(sliced === txtBefore){ //if a match is found
+                                matches.push(autoComplete.commandValues[i]);
+                            }
+                        }
+                        matches.push(txtBefore);
+                        return matches;
+                    };
+                    if(commandMatches().length > 0){//if theres a match in the array
+                        autoComplete.settings.storedCommandMatches = commandMatches();
+                        elmId.value = autoComplete.settings.storedCommandMatches[0] + txtAfter;
+                        elmId.selectionEnd = autoComplete.settings.storedCommandMatches[0].length;
+                        autoComplete.settings.previousSelectionStart = elmId.selectionEnd;
+                        autoComplete.settings.previousTextAfter = txtAfter;
+                        autoComplete.settings.previousTextBefore = (elmId.value).substring(0, elmId.selectionStart);
+                    }
+                }
+            },
+        update:
+            function(elmId){
+                elmId.value = autoComplete.settings.storedCommandMatches[autoComplete.settings.currentArrayPosition] + autoComplete.settings.previousTextAfter;
+                elmId.selectionEnd = autoComplete.settings.storedCommandMatches[autoComplete.settings.currentArrayPosition].length;
+                autoComplete.settings.previousSelectionStart = elmId.selectionEnd;
+                autoComplete.settings.previousTextAfter = (elmId.value).substring(elmId.selectionStart, elmId.value.length);
+                autoComplete.settings.previousTextBefore = (elmId.value).substring(0, elmId.selectionStart);
+            }
+    };
 
-    //start the socket
-    var socket = (function(){ //left in a function in case of need to add something else
-        return io();
-    })();
     //the keyup event
     $('#message').keyup(function(keyVal){ //user sends a message by pressing up enter_key
         if(keyVal.which == 13){
@@ -213,7 +265,43 @@ $(document).ready(function(){
             // be sent on the 2nd
         }
     });
+    //the keydown event to use the TAB for autocomplete
+    $('body').keydown(function(keyVal){
+    //if it was keyup/keypress it would first change and only then do the rest
+    //in this case it first parses when the key is pressed and only then _
+    //it does what it's supposed to do.
+        if(keyVal.which == 9 && $('#message').is(':focus')){
+            var elmId = document.getElementById('message');
+            var position = elmId.selectionStart; //gets the input cursor position
+            if(elmId.value.slice(0,1) === '\\'){
+                if(position !== autoComplete.settings.previousSelectionStart){
+                    autoComplete.new(elmId, position);
+                } else {
+                    if(
+                        (elmId.value).substring(0, elmId.selectionStart) === autoComplete.settings.previousTextBefore
+                        &&
+                        (elmId.value).substring(position, elmId.value.length) === autoComplete.settings.previousTextAfter
+                    ){
+                        if(autoComplete.settings.currentArrayPosition < (autoComplete.settings.storedCommandMatches.length-1)){
+                            autoComplete.settings.currentArrayPosition++;
+                            autoComplete.update(elmId);
+                        } else {
+                            autoComplete.settings.currentArrayPosition = 0;
+                            autoComplete.update(elmId);
+                        }
+                    } else {
+                        autoComplete.new(elmId, position);
+                    }
+                }
+            keyVal.preventDefault(); //it cancels the default TAB function so it won't change focus
+            }
+        }
+    });
     //server communication
+    //start the socket
+    var socket = (function(){ //left in a function in case of need to add something else
+        return io();
+    })();
     socket.on('connect', function(){ //When user first connects
         clientObj.labelParser('system', 'server-message-good', '', 'Connected');
         socket.emit('newConnection');//goes to the server to broadcast _
