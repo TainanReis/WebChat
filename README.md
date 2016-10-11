@@ -20,6 +20,12 @@ Easy private webchat with file transfer (check version 1st)
     - `\scroll` or `\scroll-off` enables or disables autoscroll
     - press TAB to autocomplete the commands (don't forget that it will only look for a command if
     the 1st char is `\`)
+ - For external connections go to your router administration page and:
+  - Choose the internal host (internal IP of your computer that is running the Node.js server)
+  - Protocol: TCP
+  - External Port Nr: 80 - 80
+  - Internal Port Nr: 3000 - 3000 (defined in index.js)
+  - Put your external IP @your browser's address bar
 
 I am doing this for my own learning purposes. Since I'm sharing it to whoever may be interested, I commented the code to easy understanding.
 
