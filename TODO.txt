@@ -1,0 +1,9 @@
+- Add support for nicknames
+    - Generate nickname
+    - Allow user to choose a nickname
+    - Remove user from array when disconnected
+- Add “{user} is typing” functionality (only for the tracked users)
+- Show who’s online
+- Other stuff:
+    - Show a message when server is disconnected
+    - Format HTML for better look

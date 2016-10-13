@@ -32,8 +32,9 @@ I am doing this for my own learning purposes. Since I'm sharing it to whoever ma
 ##TODO (not organized):
  - Add support for nicknames
  - Add “{user} is typing” functionality
- -Show something when everybody received a message and something different when not
- everyone received the message
+ - Allow groups
+ - Show something when everybody received a message and something different when not
+ everyone received the message (I'll implement this when I create groups)
  - Show who’s online
  - Add file transfer support
  - Hyperlinks
