@@ -7,3 +7,5 @@
 - Other stuff:
     - Show a message when server is disconnected
     - Format HTML for better look
+    - Update Javascript code
+    - After limiting the message maxlenght, implement SPAM control

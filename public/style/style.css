@@ -1,62 +1,49 @@
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
+/* Structure */
 body {
-    font: 13px Helvetica, Arial;
-    height: 100%;
+  font: 1.3em Helvetica, Arial, Sans-Serif;
+  margin: 0 auto;
+}
+.container {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  height: 100vh;
+  width: 100vw;
+}
+.messageboard {
+  box-sizing: border-box;
+  background-color: green;
+  height: 80%;
+  width: 100%;
+  overflow: auto;
+}
+.enabled-options {
+  box-sizing: border-box;
+  background-color: black;
+  height: 5%;
+  width: 100%;
+}
+.textarea {
+  box-sizing: border-box;
+  background-color: yellow;
+  height: 15%;
+  width: 100%;
+  padding: 1%;
 }
 
-/*chat body*/
-ul {
-    list-style-type: none;
-}
-#container {
-    /* position: fixed; */
-    width: 100%;
-    max-height: 100%;
-    top: 0;
+#textarea {
+  box-sizing: border-box;
+  resize: none;
+  width: 100%;
+  height: 100%;
 }
 
-#messageboard {
-    position: fixed;
-    overflow: auto;
-    max-height: 88%;
-    width: 100%;
-    height: 100%; 
-    top: 0;
+/* Messageboard Style*/
+.messageboard ul {
+  list-style-type: none;
 }
-/*user input*/
-.panel.panel-default.user-input{
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    height: 10%;
-}
-#enabled-options {
-    border: 0;
-    height: 5%;
-    top: 0;
-}
-.panel.panel-default.user-input .panel-body{
-    width: 100%;
-    height: 100%;
-}
-#test-div-label {
-    border: 0;
-    height: 5%;
-    top: 0;
-}
-#message {
-    border: 0;
-    width: 90%;
-    height: 90%;
-    margin-right: .5%;
-    resize: none;
-}
-#test-button {
-    border: none;
-    width: 9%;
-    /* position: fixed; */
-}
+
+/* Messages Colors */
 .server-message-good {
     color: darkolivegreen;
     font-size: 11px;
@@ -82,10 +69,5 @@ ul {
     font-size: 14px;
 }
 .normal-msg-received{
-    /*this the message everybody else receive when someone sends a message*/
-    color: black;
-    font-weight: bold;
-}
-#track-on {
-    background-color: dimgrey;
+
 }

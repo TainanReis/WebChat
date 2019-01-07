@@ -1,9 +1,14 @@
 /* handles the communication between client-server-client and clientA-clientA */
-$(document).ready(function(){
+window.addEventListener('load',function() {
+  const messageBoardElement = document.querySelector('.container .messageboard');
+  const textareaElement = document.querySelector('.container .textarea #textarea');
 
     function autoScroll(){ //scrolls to the most recent message
-        var scrollSize = $('#messageboard')[0].scrollHeight;
-        $('#messageboard').animate({ scrollTop: scrollSize}, 0);
+      messageBoardElement.scrollIntoView(false);
+
+        /*var scrollSize = $('.messageboard')[0].scrollHeight;
+        $('.messageboard').animate({ scrollTop: scrollSize}, 0);
+        */
     }
     //handles communication between client&user
     var clientObj = {
@@ -13,46 +18,54 @@ $(document).ready(function(){
             track: ''
         },
         fromUser: function(msg){
-            var msgObj = { //I'll let this open
+            let msgObj = { //I'll let this open
                 message: msg
             };
             socket.emit('message', msgObj); //send to server
         },
         toUser: function(msg){
-            $('#result').append('<li>' + msg + '</li>');
+          /* The messages take a form like this:
+            <p>
+            <label class="normal-msg-received" name="39">39: </label>
+            Cool message!
+            </p>
+          */
+          let newLine = document.createElement('p'); //every message is put inside a <p></p>
+          let newLabel = document.createElement('label'); //every <p> has a <label>
+          newLabel.textContent = msg.subject; //Adds the subject to the label
+          newLine.textContent = msg.message; //Adds the message to the new line
+          newLabel.setAttribute("class", msg.classVar); //It always has a class
+          msg.name ? newLabel.setAttribute("name", msg.name) : ''; //It only defines the name if it exists. _
+          msg.id ? newLabel.setAttribute("id", msg.id) : ''; //_without this it shows something like <label class="some_value" id name>
+          let newMessage = messageBoardElement.appendChild(newLine); //Every new message has a newline (a <p>)
+          newMessage.insertAdjacentElement('afterbegin', newLabel); //adds the label to the new line. "afterbegin"_
+          //_ inserts the label before the msg.message
             //check if autoscrolling is enabled
             if(clientObj.userSettings.autoScroll === 'enabled'){
+              //^Improve this
                 autoScroll();
             }
         },
         labelParser: function(type, classVar, id, message){
-        //labels that are shown @chat_board
-            var label = '';
+        //labels that are shown @messageboard
+            let label = {};
+            function labelConstructor (att1, att2, att3, att4){
+              //<label class="classVar" att1 att2> att3 </label> att4
+              label = {'classVar': classVar, 'name': att1, 'id': att2, 'message': att3, 'subject': att4};
+            };
             switch(type){
                 case 'sent':
-                //<label class="" name="">You:</label> message
-                    label = '<label class="' + classVar + 
-                            '" name="' + id + 
-                            '">You:</label> ' + message;
+                labelConstructor(id, '', message, 'You: ');
                     break;
                 case 'received':
-                //<label class="" name="">user:</label> message
                     if(id == clientObj.userSettings.track){
-                        label = '<label class="' + classVar + 
-                            '" name ="' + id + 
-                            '" id="track-on">' + id + 
-                            ':</label> ' + message;
+                      labelConstructor(id, "track-on", message, `${id}: `);
                     } else {
-                        label = '<label class="' + classVar + 
-                            '" name ="' + id + 
-                            '">' + id + 
-                            ':</label> ' + message;
+                      labelConstructor(id, '', message, `${id}: `);
                     }
                     break;
                 case 'system':
-                    label = '<label class="' + classVar +
-                            '">' + id + ' ' +
-                            message + '</label>';
+                  labelConstructor('', '', message, `${id}: `);
                     break;
                 default:
                 //empty
@@ -61,14 +74,14 @@ $(document).ready(function(){
         },
         appendEnabledOptions: function(arg1, arg2){
             //appends a label with the enabled function
-            $('#enabled-options').append('<label class="' + 
-                                         arg1 + '">' + 
-                                         arg1 + ': ' + 
+            $('.enabled-options').append('<label class="' +
+                                         arg1 + '">' +
+                                         arg1 + ': ' +
                                          arg2 + '</label> '
                                         );
         },
         removeEnabledOptions: function(option){
-            var labels = document.getElementById("enabled-options").getElementsByClassName(option);
+            var labels = document.getElementsByClassName("enabled-options").getElementsByClassName(option);
                 for(var i = 0; i < labels.length; i++){
                     labels[i].parentElement.removeChild(labels[i]);
                 }
@@ -77,7 +90,7 @@ $(document).ready(function(){
         //in the future the name of this entry may be changed and the code inside can have something more_
         //_related to the highlights of chat_board messages
             if(type === 'on'){
-            //highlights messages   
+            //highlights messages
                 var messages = document.getElementsByName(user);
                 for(var i = 0; i < messages.length; i++){
                     messages[i].setAttribute("id", "track-on");
@@ -92,24 +105,20 @@ $(document).ready(function(){
             }
         },
         messageHandler: function(msg){
-            if(msg.slice(0,1) === '\\'){
-            //if it's a command. "\" as the first char
-                var commandArray = msg.split(' ');
-                // example: \to user msg > [\to,user,msg] > [1] = user ... [0] = \to
-                clientObj.commandList(commandArray, msg);
-            } else {
-                if(clientObj.userSettings.toFix.length > 0){
-                    //if there's a to-fix user defined
+            if(msg.slice(0,1) === '\\'){ //Check if it's a command. The commands start with '/'
+                var commandArray = msg.split(' '); // example: \to user msg > [\to,user,msg] > [1] = user ... [0] = \to
+                clientObj.commandList(commandArray, msg); //parse the command
+            } else { //if it's not a command, it's a normal message
+                if(clientObj.userSettings.toFix.length > 0){ //if there's a to-fix user defined
                     var msgObj = {
                         message: msg,
                         user: clientObj.userSettings.toFix
                     };
                     clientObj.labelParser('sent', 'pm-send', socket.id, msgObj.message);
                     socket.emit('privateMessage', msgObj);
-                } else {
-                    //if it's a normal message
+                } else {//if there's no to-fix user defined, it's for everyone
                     clientObj.labelParser('sent', 'normal-msg-sent', socket.id, msg);
-                    clientObj.fromUser(msg);   
+                    clientObj.fromUser(msg);
                 }
             }
         },
@@ -123,7 +132,7 @@ $(document).ready(function(){
                         var functionObj = {
                             message: msg.slice(commandLength+2),
                             //takes out the command and username + two spaces _
-                            //_ between [0]&[1] and [1]&[2]. So it leaves only the message 
+                            //_ between [0]&[1] and [1]&[2]. So it leaves only the message
                             user: commandArray[1], //[1] = user
                             functionType: 'to'
                         };
@@ -131,7 +140,7 @@ $(document).ready(function(){
                         socket.emit('confirmUser', functionObj);
                         //appends the message anyway but confirms the user before sending
                     }
-                    
+
                     break;
                 case '\\to-fix':
                     //sends the messages to a defined user
@@ -164,7 +173,7 @@ $(document).ready(function(){
                         };
                         socket.emit('confirmUser', functionObj);
                     }
-                    
+
                     break;
                 case '\\track-off':
                     //clears highlights
@@ -196,107 +205,81 @@ $(document).ready(function(){
     //autoComplete object
     var autoComplete = {
         settings: {
+            txtBefore: "",
+            txtAfter: "",
             previousSelectionStart: 0,
             currentArrayPosition: 0,
-            storedCommandMatches: [],
-            previousTextAfter: '',
-            previousTextBefore: ''
+            storedCommandMatches: []
         },
         commandValues:
             ['\\to', '\\to-fix', '\\to-unfix', '\\track', '\\track-off', '\\scroll', '\\scroll-off', '\\test1'],
+        changeValue:
+          function(elmId, arrayPosition){
+            let settings = autoComplete.settings;
+            elmId.value = settings.storedCommandMatches[arrayPosition] + settings.txtAfter; //completes the "\sc" with the 1st match
+            elmId.setSelectionRange(settings.txtBefore.length, settings.storedCommandMatches[arrayPosition].length);
+            ++settings.currentArrayPosition;
+          },
         highestLength:
-            function(){ //as the name says...
-                var highestLength = 0;
-                for(var i in autoComplete.commandValues){
-                    if(autoComplete.commandValues[i].length > highestLength){
-                        highestLength = autoComplete.commandValues[i].length;
-                    }
-                }
-                return highestLength;
-            },
-        new: 
+          function(){ //as the name says...
+                //gets the highest length value in the array and return it's length
+                let highestLengthValue = (accumulator, currentValue) => accumulator.length > currentValue.length ? accumulator : currentValue;
+                return autoComplete.commandValues.reduce(highestLengthValue).length;
+          },
+        new:
             function(elmId, position){
                 if(position <= autoComplete.highestLength()){
-                    var txtBefore = (elmId.value).substring(0, position); //what is before the cursor
-                    var txtAfter = (elmId.value).substring(position, elmId.value.length); //what is after the cursor
-                    var commandMatches = function(){
-                        var matches = [];
-                        for(var i in autoComplete.commandValues){
-                            var sliced = autoComplete.commandValues[i].slice(0, position); //to find a match
-                            if(sliced === txtBefore){ //if a match is found
-                                matches.push(autoComplete.commandValues[i]);
-                            }
-                        }
-                        matches.push(txtBefore);
+                    autoComplete.settings.txtBefore = txtBefore = (elmId.value).substring(0, position); //what is before the cursor
+                    autoComplete.settings.txtAfter = txtAfter = (elmId.value).substring(position, elmId.value.length); //what is after the cursor
+                    var commandMatches = function(){ //return all the matches, e.g., "\sc" matches with \scroll and \scroll-off
+                        let matches = []; //store all the matches
+                        autoComplete.commandValues.map(currentValue => currentValue.slice(0, position) === txtBefore ? matches.push(currentValue) : '');
+                        matches.push(txtBefore); //pushes the txtBefore, i.e., in this case/example "\sc"
                         return matches;
                     };
-                    if(commandMatches().length > 0){//if theres a match in the array
-                        autoComplete.settings.storedCommandMatches = commandMatches();
-                        elmId.value = autoComplete.settings.storedCommandMatches[0] + txtAfter;
-                        elmId.selectionEnd = autoComplete.settings.storedCommandMatches[0].length;
-                        autoComplete.settings.previousSelectionStart = elmId.selectionEnd;
-                        autoComplete.settings.previousTextAfter = txtAfter;
-                        autoComplete.settings.previousTextBefore = (elmId.value).substring(0, elmId.selectionStart);
+                    if(commandMatches().length > 0){//if theres a match in the array update the .settings values
+                        autoComplete.settings.storedCommandMatches = commandMatches(); //stores the found matches
+                        autoComplete.changeValue(elmId, 0);
+
                     }
                 }
             },
-        update:
-            function(elmId){
-                elmId.value = autoComplete.settings.storedCommandMatches[autoComplete.settings.currentArrayPosition] + autoComplete.settings.previousTextAfter;
-                elmId.selectionEnd = autoComplete.settings.storedCommandMatches[autoComplete.settings.currentArrayPosition].length;
-                autoComplete.settings.previousSelectionStart = elmId.selectionEnd;
-                autoComplete.settings.previousTextAfter = (elmId.value).substring(elmId.selectionStart, elmId.value.length);
-                autoComplete.settings.previousTextBefore = (elmId.value).substring(0, elmId.selectionStart);
-            }
+        update: function(elmId){
+          let settings = autoComplete.settings;
+          if(settings.currentArrayPosition >= settings.storedCommandMatches.length) {
+            settings.currentArrayPosition = 0;
+          }
+          autoComplete.changeValue(elmId, settings.currentArrayPosition);
+        }
     };
 
-    //the keyup event
-    $('#message').keyup(function(keyVal){ //user sends a message by pressing up enter_key
-        if(keyVal.which == 13){
-            var msg = $('#message').val().slice(0,-1); //takes out the enter_char @the_end
-            var msgChar = msg.length;
-            if(msgChar !== 0){
-                clientObj.messageHandler(msg);
-            }
-            $('#message').val('');
-            //clears the text_box.
-            //The Enter_key counts as a char.
-            // If not cleared in the 1st keyup it could _
-            // be sent on the 2nd
-        }
+    //the keyup event: if Enter key is pressed
+    //The message is sent when the Enter Key is pressed Up
+    textareaElement.addEventListener('keyup', (keyVal) => {
+      if(keyVal.key === "Enter"){
+          let msg = textareaElement.value.slice(0,-1); //takes out the enter_char @the_end
+          if(msg.length > 0){
+            clientObj.messageHandler(msg);
+          }
+          textareaElement.value = "";
+      }
     });
-    //the keydown event to use the TAB for autocomplete
-    $('body').keydown(function(keyVal){
-    //if it was keyup/keypress it would first change and only then do the rest
-    //in this case it first parses when the key is pressed and only then _
-    //it does what it's supposed to do.
-        if(keyVal.which == 9 && $('#message').is(':focus')){
-            var elmId = document.getElementById('message');
-            var position = elmId.selectionStart; //gets the input cursor position
-            if(elmId.value.slice(0,1) === '\\'){
-                if(position !== autoComplete.settings.previousSelectionStart){
-                    autoComplete.new(elmId, position);
-                } else {
-                    if(
-                        (elmId.value).substring(0, elmId.selectionStart) === autoComplete.settings.previousTextBefore
-                        &&
-                        (elmId.value).substring(position, elmId.value.length) === autoComplete.settings.previousTextAfter
-                    ){
-                        if(autoComplete.settings.currentArrayPosition < (autoComplete.settings.storedCommandMatches.length-1)){
-                            autoComplete.settings.currentArrayPosition++;
-                            autoComplete.update(elmId);
-                        } else {
-                            autoComplete.settings.currentArrayPosition = 0;
-                            autoComplete.update(elmId);
-                        }
-                    } else {
-                        autoComplete.new(elmId, position);
-                    }
-                }
-            keyVal.preventDefault(); //it cancels the default TAB function so it won't change focus
-            }
+
+    textareaElement.addEventListener('keydown', (keyVal) => {
+      if(keyVal.key === "Tab"){
+        let position = textareaElement.selectionEnd; //gets the input cursor (End) position
+        if(textareaElement.value.slice(0,1) === '\\' && position > 0){
+          let incompleteCommand = (textareaElement.value).substring(0, position); // e.g., "\sc|" the result can be "\scroll*" but the incompleteCommand is always this one
+          if(autoComplete.settings.storedCommandMatches.indexOf(incompleteCommand) > -1) {//if TAB is pressed +1 for "\sc|" it will run through the array of already found matches
+            autoComplete.update(textareaElement);
+          } else { //if it's the 1st time the TAB is pressed, it creates a new array with the matches
+            autoComplete.new(textareaElement, position); //Later I'll export this, that's why it's parsing textareaElement
+          }
         }
+        keyVal.preventDefault(); //it cancels the default TAB function so it won't change focus
+      }
     });
+    
     //server communication
     //start the socket
     var socket = (function(){ //left in a function in case of need to add something else
@@ -348,8 +331,5 @@ $(document).ready(function(){
                 alert('error: eventClient>socketOn>confirmedUser');
         }
     });
-    /*$('#test-button').click(function(){
-        //empty
-    });*/
     clientObj.commandList(['\\scroll'], ''); //enables scroll when page loads
-})
+});
