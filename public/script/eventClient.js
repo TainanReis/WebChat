@@ -244,8 +244,9 @@ window.addEventListener('load',function() {
                     }
                 }
             },
-        update: function(elmId){
+        update: function(elmId, position){
           let settings = autoComplete.settings;
+          settings.txtAfter = txtAfter = (elmId.value).substring(position, elmId.value.length); //what is after the cursor
           if(settings.currentArrayPosition >= settings.storedCommandMatches.length) {
             settings.currentArrayPosition = 0;
           }
@@ -271,7 +272,7 @@ window.addEventListener('load',function() {
         if(textareaElement.value.slice(0,1) === '\\' && position > 0){
           let incompleteCommand = (textareaElement.value).substring(0, position); // e.g., "\sc|" the result can be "\scroll*" but the incompleteCommand is always this one
           if(autoComplete.settings.storedCommandMatches.indexOf(incompleteCommand) > -1) {//if TAB is pressed +1 for "\sc|" it will run through the array of already found matches
-            autoComplete.update(textareaElement);
+            autoComplete.update(textareaElement, position);
           } else { //if it's the 1st time the TAB is pressed, it creates a new array with the matches
             autoComplete.new(textareaElement, position); //Later I'll export this, that's why it's parsing textareaElement
           }
@@ -279,7 +280,7 @@ window.addEventListener('load',function() {
         keyVal.preventDefault(); //it cancels the default TAB function so it won't change focus
       }
     });
-    
+
     //server communication
     //start the socket
     var socket = (function(){ //left in a function in case of need to add something else

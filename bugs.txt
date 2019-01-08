@@ -1,5 +1,1 @@
-#autoComplete.changeValue: It's related to the settings.txtAfter
-  1- write: \ anything
-  2- put the cursor @pos1 and press TAB: \| anything
-  3- delete everything except \
-  4- press tab
+
