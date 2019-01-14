@@ -240,9 +240,12 @@ window.addEventListener('load',function() {
 
     //the keyup event: if Enter key is pressed
     //The message is sent when the Enter Key is pressed Up
-    textareaElement.addEventListener('keyup', (keyVal) => {
+    textareaElement.addEventListener('keyup', keyVal => {
       if(keyVal.key === "Enter"){
-        let msg = textareaElement.value.slice(0,-1); //takes out the enter_char @the_end
+        //let msg = textareaElement.value.slice(0,-1); //takes out the enter_char @the_end
+        textareaElement.setSelectionRange(0, 0)
+        let msg = textareaElement.value;
+        console.log(msg);
         if(msg.length > 0){
           clientObj.messageHandler(msg);
         }
@@ -250,7 +253,7 @@ window.addEventListener('load',function() {
       }
     });
 
-    textareaElement.addEventListener('keydown', (keyVal) => {
+    textareaElement.addEventListener('keydown', keyVal => {
       if(keyVal.key === "Tab"){
         let position = textareaElement.selectionEnd; //gets the input cursor (End) position
         if(textareaElement.value.slice(0,1) === '\\' && position > 0){
@@ -262,6 +265,8 @@ window.addEventListener('load',function() {
           }
         }
         keyVal.preventDefault(); //it cancels the default TAB function so it won't change focus
+      } else if(keyVal.key === "Enter"){
+        keyVal.preventDefault(); //prevents a massive span and you can TAB for a command and press Enter and it will not replace the selection for ""
       }
     });
 
