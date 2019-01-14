@@ -23,15 +23,10 @@ app.get('/', function(req, res){
     res.sendFile(__dirname + '/public/main.html');
 });
 //----- end of references
-var getUserId = function(socketId){ //to run the usersArray
-    for(var i in usersArray){
-            if (usersArray[i] == socketId){
-                return ++i; //Return user position @theArray AKA userId
-            }
-        }
-};
-function getSocketById(userId){ //this function is for when I have nicknames working
-    return usersArray[userId-1];
+var getUserId = socketId => usersArray.indexOf(socketId);
+
+function getSocketById(userId){ // "\to 4 message" for now, without nicknames, it simply returns usersArray[4]
+    return usersArray[userId];
 }
 function labelObj (type, classVar, id, message){
 //Creates a new labelObj to be sent back to the client.
@@ -46,13 +41,11 @@ io.on('connection', function(socket){
     function userId(){
         return getUserId(socket.id);
     }
-    function confirmUser(user){
-    //checks if the user is on the array
+    function confirmUser(user){ //checks if the user is on the array
         if(!getSocketById(user)){
-        //if the user is not found, gives error message
-        //I'll associate user ID/name to the socket when implement nicknames _
-        //so now, when a user disconnects he remains on the array
-            var label = new labelObj('system', 'server-message-bad', '', 'User (' + user + ') doesn\'t exist ot isn\'t online');
+        //if the user is not found, sends an error message
+        //Important: for now, when a user disconnects he remains on the array
+            let label = new labelObj('system', 'server-message-bad', '', `User ${user} doesn't exist or is offline`);
             io.to(socket.id).emit('message', label);
         } else {
             return true;
@@ -75,26 +68,19 @@ io.on('connection', function(socket){
         io.emit('message', label);
     });
     socket.on('privateMessage', function(msgObj){
-        if(confirmUser(msgObj.user) === true){
+        if(confirmUser(msgObj.user)){
             var label = new labelObj('received', 'pm-receive', userId(), msgObj.message);
             io.to(getSocketById(msgObj.user)).emit('message', label);
         }
     });
     socket.on('confirmUser', function(functionObj){
-        if(confirmUser(functionObj.user) === true){
-            functionObj.serverAnswer = true;
+        if(confirmUser(functionObj.user)){//if true, i.e., if user exists
+            //functionObj.serverAnswer = true;
+            io.to(socket.id).emit('confirmedUser', functionObj); //returns the obj to the client so it can complete the request
+        } /*else {
+            //functionObj.serverAnswer = false;
             io.to(socket.id).emit('confirmedUser', functionObj);
-            //now that the user is confirmed, it returns the obj to the client so it can complete_
-            //_ the request
-        } else {
-            functionObj.serverAnswer = false;
-            //parses a new object value (false) cause needed like it is on \track username
-            //on this specific case (track) we send to the server a request to confirm username _
-            //_ and we  receive an answer somewhere on the client. Instead of creating a new socket.on @client or _
-            //_ adding a new property for specific functionObj.functionType, we automate it so all the _
-            //_ remaining cases are left to the client.
-            io.to(socket.id).emit('confirmedUser', functionObj);
-        }
+        }*/
     });
 });
 

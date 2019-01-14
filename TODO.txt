@@ -1,5 +1,5 @@
 clientObj.commandList:
-  - Run through this entry and make sure all the commands are working properly 
+  - Run through this entry and make sure all the commands are working properly: Done
 #
 - Add support for nicknames
     - Generate nickname

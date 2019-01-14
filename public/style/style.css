@@ -12,14 +12,14 @@ body {
 }
 .messageboard {
   box-sizing: border-box;
-  background-color: green;
+  background-color: grey;
   height: 80%;
   width: 100%;
   overflow: auto;
 }
 .enabled-options {
   box-sizing: border-box;
-  background-color: black;
+  background-color: darkolivegreen;
   height: 5%;
   width: 100%;
 }
