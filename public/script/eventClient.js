@@ -27,7 +27,7 @@ window.addEventListener('load',function() {
         };
         socket.emit('message', msgObj); //send to server
       },
-      toUser: function(msg){
+      toUser: function(attVals){
         /* The messages have this structure:
           <p>
             <label class="normal-msg-received" name="39">39: </label>
@@ -36,43 +36,40 @@ window.addEventListener('load',function() {
         */
         let newLine = document.createElement('p'); //every message is put inside a <p></p>
         let newLabel = document.createElement('label'); //every <p> has a <label>
-        newLabel.textContent = msg.subject; //Adds the subject to the label
-        newLine.textContent = msg.message; //Adds the message to the new line
-        newLabel.setAttribute("class", msg.classVar); //It always has a class
-        msg.name ? newLabel.setAttribute("name", msg.name) : ''; //It only defines the name if it exists. _
-        msg.id ? newLabel.setAttribute("id", msg.id) : ''; //_without this it shows something like <label class="some_value" id name>
+        newLabel.textContent = attVals.subject; //Adds the subject to the label
+        newLine.textContent = attVals.message; //Adds the message to the new line
+        newLabel.setAttribute("class", attVals.classVar); //It always has a class
+        attVals.name ? newLabel.setAttribute("name", attVals.name) : ''; //It only defines the name if it exists. _
+        attVals.id ? newLabel.setAttribute("id", attVals.id) : ''; //_without this it shows something like <label class="some_value" id name>
         let newMessage = messageBoardElement.appendChild(newLine); //Every new message has a newline (a <p>)
-        newMessage.insertAdjacentElement('afterbegin', newLabel); //adds the label to the new line. "afterbegin"_
-        //_ inserts the label before the msg.message
+        newMessage.insertAdjacentElement('afterbegin', newLabel); //adds the label to the new line. "afterbegin" inserts the label before the msg.message
       },
-      labelParser: function(type, classVar, id, message){ //labels that are shown @messageboard
-        let label = {};
+      labelParser: function(type, classVar, name, socket, message){ //labels that are shown @messageboard
+        let attVals = {};
         function labelConstructor (att1, att2, att3, att4, att5){
-          //<label class="classVar" att1 att2> att3 </label> att4 | att5 adds a second class value
-          label = {'classVar': classVar + att5, 'name': att1, 'id': att2, 'message': att3, 'subject': att4};
+          //<label class="classVar att5" att1 att2> att3 </label> att4
+          attVals = {'classVar': classVar + att5, 'name': att1, 'id': att2, 'subject': att3, 'message': att4};
         };
         switch(type){
           case 'sent': //The sent message is appended to the messageBoardElement, even if is not received by anyone. No need to send it to the server so it can be shown to the sender
-            labelConstructor(id, '', message, 'You: ', '');
+            labelConstructor(socket, '', 'You: ', message, '');
             break;
           case 'received': //deals with the received messages
-            if(id == clientObj.userSettings.track){ //if the user is tracking someone
-              labelConstructor(id, '', message, `${id}: `, " track-on");
+            if(socket == clientObj.userSettings.track){ //if the user is tracking someone
+              labelConstructor(socket, '', `${name}: `, message, " track-on");
             } else {
-              labelConstructor(id, '', message, `${id}: `, '');
+              labelConstructor(socket, '', `${name}: `, message, '');
             }
             break;
           case 'system': //system messages
-            labelConstructor('', '', message, `${id}: `, '');
+            labelConstructor('', '', `${name}: `, message, '');
             break;
           default:
           //empty
         }
-        clientObj.toUser(label);
+        clientObj.toUser(attVals);
       },
-      appendEnabledOptions: function(arg1, arg2){
-        //appends a label with the enabled function
-        //<label class="arg1"> arg1: arg2 </label>
+      appendEnabledOptions: function(arg1, arg2){ //appends a label with the enabled function: <label class="arg1"> arg1: arg2 </label>
         let newLabel = document.createElement('label');
         newLabel.setAttribute("class", arg1);
         newLabel.textContent = `${arg1}: ${arg2}`;
@@ -83,15 +80,15 @@ window.addEventListener('load',function() {
           let label = document.querySelector(`.${option}`);
           enabledOptionsElement.removeChild(label);
         } catch(typeError) {
-          clientObj.labelParser('system', 'server-message-bad', '', 'Option already disabled');
+          clientObj.labelParser('system', 'server-message-bad', '', '', 'Option already disabled');
         }
       },
-      trackFunction: function(state, user){ //this is called when an user wants to track/stoptracking another user
+      trackFunction: function(state, user, socket){ //this is called when an user wants to track/stoptracking another user
         if(state === "on"){ //to enable tracking
-          let trackElements = function(){return Object.values(document.getElementsByName(user))}; //returns an object with all the elements found
+          let trackElements = function(){return Object.values(document.getElementsByName(socket))}; //returns an object with all the elements found
           trackElements().map(element => element.setAttribute("class", element.getAttribute("class") + " track-on")); //run through each element and and another value to the "class" attribute
           clientObj.appendEnabledOptions("track-on", user);
-          clientObj.userSettings.track = user; //defines the user to be tracked
+          clientObj.userSettings.track = socket; //defines the user socket to be tracked
         } else { //to disabled it
           let trackElements = function(){return Object.values(messageBoardElement.getElementsByTagName("label"))};
           trackElements().map(element => { //run through each element and replaces " track-on" (with the space) with '' (nothing)
@@ -110,12 +107,12 @@ window.addEventListener('load',function() {
             if(clientObj.userSettings.toFix !== ''){ //if there's a to-fix user defined
               var msgObj = {
                 message: msg,
-                user: clientObj.userSettings.toFix
+                socketId: clientObj.userSettings.toFix
               };
-              clientObj.labelParser('sent', 'pm-send', socket.id, msgObj.message);
+              clientObj.labelParser('sent', 'pm-send', '', socket.id, msgObj.message);
               socket.emit('privateMessage', msgObj);
             } else {//if there's no to-fix user defined, it's for everyone
-                clientObj.labelParser('sent', 'normal-msg-sent', socket.id, msg);
+                clientObj.labelParser('sent', 'normal-msg-sent', '', socket.id, msg);
                 clientObj.fromUser(msg);
             }
         }
@@ -123,20 +120,16 @@ window.addEventListener('load',function() {
       commandList: function(commandArray, msg){ //the Switch:Case values have to be also @autoComplete.commandValues
         switch(commandArray[0]){
           case '\\to': //sends a message to a certain user
-            if(commandArray[1] && commandArray[2]){
-              //if there's a user and a message
-              let commandLength = commandArray[0].length + commandArray[1].length;
-              //takes the total length of command+userId
+            if(commandArray[1] && commandArray[2]){ //if there's a user and a message
+              let commandLength = commandArray[0].length + commandArray[1].length; //takes the total length of command+username
               let functionObj = {
-                message: msg.slice(commandLength+2),
-                  //takes out the command and username + two spaces _
-                  //_ between [0]&[1] and [1]&[2]. So it leaves only the message
-                  user: commandArray[1], //[1] = user
-                  functionType: 'to'
+                message: msg.slice(commandLength+2), //takes out the command and username + two spaces, between [0]&[1] and [1]&[2]. So it leaves only the message
+                user: commandArray[1], //[1] = user
+                functionType: 'to'
               };
-              clientObj.labelParser('sent', 'pm-send', socket.id, functionObj.message);
+              //appends the message anyway but confirms the user (if it exists) before sending
+              clientObj.labelParser('sent', 'pm-send', '', socket.id, functionObj.message);
               socket.emit('confirmUser', functionObj);
-              //appends the message anyway but confirms the user (existence) before sending
             }
             break;
           case '\\to-fix': //fix the messages, so they are all sent to a certain defined user
@@ -147,7 +140,7 @@ window.addEventListener('load',function() {
               };
               socket.emit('confirmUser', functionObj); //confirms that the user exists
             } else { //if no username was specified
-              clientObj.labelParser('system', 'server-message-bad', '', `Wrong syntax. Try: \\to-fix username`);
+              clientObj.labelParser('system', 'server-message-bad', '', '', `Wrong syntax. Try: \\to-fix username`);
             }
             break;
           case '\\to-unfix': //removes the fixed user (see the entry above)
@@ -156,7 +149,7 @@ window.addEventListener('load',function() {
             break;
           case '\\track': //tracks all the messages sent by a specified user
             if(!(commandArray[1])){ //if there's no username specified
-              clientObj.labelParser('system', 'server-message-bad', '', `Wrong syntax. Try: \\track username`);
+              clientObj.labelParser('system', 'server-message-bad', '', '', `Wrong syntax. Try: \\track username`);
             } else {
                 let functionObj = {
                   user: commandArray[1],
@@ -177,49 +170,55 @@ window.addEventListener('load',function() {
             clientObj.removeEnabledOptions('scroll');
             observer.disconnect();
             break;
-          case '\\test': //to test autoscroll
+          case '\\name': //changes the username
+            if(!(commandArray[1])){ //if there is no name specified
+              clientObj.labelParser('system', 'server-message-bad', '', '', `Wrong syntax. Try: \\name username`);
+            } else {
+              socket.emit('changeName', commandArray[1]);
+            }
+            break;
+          case '\\test': //created to test autoscroll. I'll let this here for now to test whatever may be useful
             for(let i=0; i<100; i++){
-              clientObj.labelParser('system', 'server-message-bad', '', 'spamming');
+              clientObj.labelParser('system', 'server-message-bad', '', '', 'spamming');
             }
             break;
           default:
-            clientObj.labelParser('system', 'server-message-bad', '', 'Error: Command not recognized.');
+            clientObj.labelParser('system', 'server-message-bad', '', '', 'Error: Command not recognized.');
       }
     }
   };
-    //autoComplete object
+  //autoComplete object
   var autoComplete = {
-    settings: {
+    settings: { //stores some values we'll need in the entries bellow
       txtBefore: "",
       txtAfter: "",
       previousSelectionStart: 0,
       currentArrayPosition: 0,
       storedCommandMatches: []
     },
-    commandValues:
-      ['\\to', '\\to-fix', '\\to-unfix', '\\track', '\\track-off', '\\scroll', '\\scroll-off', '\\test'],
-    changeValue:
-      function(elmId, arrayPosition){
-        let settings = autoComplete.settings;
+    commandValues: //it will find matches according to these values
+      ['\\to', '\\to-fix', '\\to-unfix', '\\track', '\\track-off', '\\scroll', '\\scroll-off', '\\name', '\\test'],
+    changeValue: //the changes in the element happens from here
+      (elmId, arrayPosition) => { //the elmId is where everything is happening, the arrayPosition is the position @the storedCommandMatches array
+        let settings = autoComplete.settings; //for simplicity sake
         elmId.value = settings.storedCommandMatches[arrayPosition] + settings.txtAfter; //completes the "\sc" with the 1st match
-        elmId.setSelectionRange(settings.txtBefore.length, settings.storedCommandMatches[arrayPosition].length);
-        ++settings.currentArrayPosition;
+        elmId.setSelectionRange(settings.txtBefore.length, settings.storedCommandMatches[arrayPosition].length); //what's added stays selected
+        ++settings.currentArrayPosition; //so next time, the next array value is shown
       },
-    highestLength:
-      function(){ //as the name says...
-        //gets the highest length value in the array and return it's length
+    highestLength: //as the name says... gets the highest length value in the array and return it's length
+      () => {
         let highestLengthValue = (accumulator, currentValue) => accumulator.length > currentValue.length ? accumulator : currentValue;
         return autoComplete.commandValues.reduce(highestLengthValue).length;
       },
-    new:
-      function(elmId, position){
-        if(position <= autoComplete.highestLength()){
+    new: //when a new autoComplete is created
+      (elmId, position) => {
+        if(position <= autoComplete.highestLength()){ //if the supposed command size (according to "position") has an higher length than the ones @commandValues, it's unnecessary to process the code bellow.
           autoComplete.settings.txtBefore = txtBefore = (elmId.value).substring(0, position); //what is before the cursor
           autoComplete.settings.txtAfter = txtAfter = (elmId.value).substring(position, elmId.value.length); //what is after the cursor
           var commandMatches = function(){ //return all the matches, e.g., "\sc" matches with \scroll and \scroll-off
             let matches = []; //store all the matches
-            autoComplete.commandValues.map(currentValue => currentValue.slice(0, position) === txtBefore ? matches.push(currentValue) : '');
-            matches.push(txtBefore); //pushes the txtBefore, i.e., in this case/example "\sc"
+            autoComplete.commandValues.map(currentValue => currentValue.slice(0, position) === txtBefore ? matches.push(currentValue) : ''); //pushes the matches to the array
+            matches.push(txtBefore); //pushes the txtBefore, i.g., "\sc". This is the text before the completed command: "\sc[roll]"
             return matches;
             };
             if(commandMatches().length > 0){//if theres a match in the array update the .settings values
@@ -228,33 +227,32 @@ window.addEventListener('load',function() {
             }
         }
       },
-    update: function(elmId, position){
-      let settings = autoComplete.settings;
-      settings.txtAfter = txtAfter = (elmId.value).substring(position, elmId.value.length); //what is after the cursor
-      if(settings.currentArrayPosition >= settings.storedCommandMatches.length) {
-        settings.currentArrayPosition = 0;
+    update: //to proceed moving through the storedCommandMatches
+      (elmId, position) => {
+        let settings = autoComplete.settings; //for simplicity sake
+        settings.txtAfter = txtAfter = (elmId.value).substring(position, elmId.value.length); //what is after the cursor
+        if(settings.currentArrayPosition >= settings.storedCommandMatches.length) { //if we got to the end of the storedCommandMatches
+          settings.currentArrayPosition = 0; //sets the currentArrayPosition to 0 so we can run it again from start
+        }
+        autoComplete.changeValue(elmId, settings.currentArrayPosition); //changes the value in the element, in this case textareaElement
       }
-      autoComplete.changeValue(elmId, settings.currentArrayPosition);
-    }
-    };
+      };
 
     //the keyup event: if Enter key is pressed
     //The message is sent when the Enter Key is pressed Up
     textareaElement.addEventListener('keyup', keyVal => {
-      if(keyVal.key === "Enter"){
-        //let msg = textareaElement.value.slice(0,-1); //takes out the enter_char @the_end
-        textareaElement.setSelectionRange(0, 0)
+      if(keyVal.key === "Enter"){ //if Enter key is pressed
+        textareaElement.setSelectionRange(0, 0) //puts the cursor @the beginning so enterKey won't change the selected value for ''. This was a problem that was happening when navigating through commands using TAB
         let msg = textareaElement.value;
-        console.log(msg);
-        if(msg.length > 0){
-          clientObj.messageHandler(msg);
+        if(msg.length > 0){ //if there's indeed a message it's length is > 1
+          clientObj.messageHandler(msg); //from here the message is parsed
         }
         textareaElement.value = "";
       }
     });
 
     textareaElement.addEventListener('keydown', keyVal => {
-      if(keyVal.key === "Tab"){
+      if(keyVal.key === "Tab"){ //if Tab key is pressed
         let position = textareaElement.selectionEnd; //gets the input cursor (End) position
         if(textareaElement.value.slice(0,1) === '\\' && position > 0){
           let incompleteCommand = (textareaElement.value).substring(0, position); // e.g., "\sc|" the result can be "\scroll*" but the incompleteCommand is always this one
@@ -265,7 +263,7 @@ window.addEventListener('load',function() {
           }
         }
         keyVal.preventDefault(); //it cancels the default TAB function so it won't change focus
-      } else if(keyVal.key === "Enter"){
+      } else if(keyVal.key === "Enter"){ //if Enter key is pressed
         keyVal.preventDefault(); //prevents a massive span and you can TAB for a command and press Enter and it will not replace the selection for ""
       }
     });
@@ -275,16 +273,15 @@ window.addEventListener('load',function() {
     var socket = (function(){ //left in a function in case of need to add something else
       return io();
     })();
-    socket.on('connect', function(){ //When user first connects
-      clientObj.labelParser('system', 'server-message-good', '', 'Connected');
-      socket.emit('newConnection');//goes to the server to broadcast _
-      //_ to the others
+    socket.on('connect', () => { //When user first connects
+      clientObj.labelParser('system', 'server-message-good', '', '', 'Connected');
+      socket.emit('newConnection');//goes to the server to be broadcasted to the others
     });
-    socket.on('message', function(obj){ //receive message
-      clientObj.labelParser(obj.labelType, obj.classVar, obj.id, obj.message);
+    socket.on('message', obj => { //when a message is received
+      clientObj.labelParser(obj.labelType, obj.classVar, obj.name, obj.socket, obj.message);
     });
-    socket.on('confirmedUser', function(functionObj){
-      switch(functionObj.functionType){
+    socket.on('confirmedUser', functionObj => { //deals with the returned user confirmation value
+      switch(functionObj.functionType){  //the user confirmation was asked by a specific command request. Here we move on with the same request
         case 'to':
           socket.emit('privateMessage', functionObj);
           break;
@@ -292,17 +289,17 @@ window.addEventListener('load',function() {
           if(clientObj.userSettings.toFix !== '') { //if it's already defined _
             clientObj.removeEnabledOptions('to-fix'); //_remove the already existent label. For now, "to-fix" only allows 1 user defined
           }
-          clientObj.userSettings.toFix = functionObj.user; //update it's valuewith the new username
+          clientObj.userSettings.toFix = functionObj.socketId; //update it's valuewith the new username
           clientObj.appendEnabledOptions(functionObj.functionType, functionObj.user); //appends the new label
           break;
         case 'track':
-          if(clientObj.userSettings.track !== ''){
-            clientObj.trackFunction("off", '');
+          if(clientObj.userSettings.track !== ''){ //if the user is already tracking someone it calls the function bellow. Doing this conditional statement, the function bellow only runs when needed, avoiding unnecessary work
+            clientObj.trackFunction("off", '', ''); //This function will take off the track-on value from the labels class and removes the appended-option.
           }
-          clientObj.trackFunction("on", functionObj.user);
+          clientObj.trackFunction("on", functionObj.user, functionObj.socketId); //enables the tracking
           break;
         default:
-          clientObj.labelParser('system', 'server-message-bad', '', 'error: eventClient>socketOn>confirmedUser');
+          clientObj.labelParser('system', 'server-message-bad', '', '','error: eventClient>socketOn>confirmedUser');
       }
     });
   clientObj.commandList(['\\scroll'], ''); //enables scroll when page loads
