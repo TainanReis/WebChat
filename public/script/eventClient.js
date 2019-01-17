@@ -39,6 +39,7 @@ window.addEventListener('load',function() {
         newLabel.textContent = attVals.subject; //Adds the subject to the label
         newLine.textContent = attVals.message; //Adds the message to the new line
         newLabel.setAttribute("class", attVals.classVar); //It always has a class
+        newLine.setAttribute("class", (attVals.classVar).replace("track-on", ""));
         attVals.name ? newLabel.setAttribute("name", attVals.name) : ''; //It only defines the name if it exists. _
         attVals.id ? newLabel.setAttribute("id", attVals.id) : ''; //_without this it shows something like <label class="some_value" id name>
         let newMessage = messageBoardElement.appendChild(newLine); //Every new message has a newline (a <p>)
@@ -242,7 +243,7 @@ window.addEventListener('load',function() {
     //The message is sent when the Enter Key is pressed Up
     textareaElement.addEventListener('keyup', keyVal => {
       if(keyVal.key === "Enter"){ //if Enter key is pressed
-        textareaElement.setSelectionRange(0, 0) //puts the cursor @the beginning so enterKey won't change the selected value for ''. This was a problem that was happening when navigating through commands using TAB
+        textareaElement.setSelectionRange(0, 0) //puts the cursor @the beginning so the enter Key won't change the selected value for ''. This was a problem that was happening when navigating through commands using TAB
         let msg = textareaElement.value;
         if(msg.length > 0){ //if there's indeed a message it's length is > 1
           clientObj.messageHandler(msg); //from here the message is parsed
@@ -267,6 +268,8 @@ window.addEventListener('load',function() {
         keyVal.preventDefault(); //prevents a massive span and you can TAB for a command and press Enter and it will not replace the selection for ""
       }
     });
+
+    textareaElement.addEventListener('focusout', () => textareaElement.focus()); //the textareaElement will always be focused
 
     //server communication
     //initiate the socket
@@ -303,4 +306,5 @@ window.addEventListener('load',function() {
       }
     });
   clientObj.commandList(['\\scroll'], ''); //enables scroll when page loads
+  textareaElement.focus(); //stays focused since the load
 });

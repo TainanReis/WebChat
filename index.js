@@ -36,7 +36,7 @@ function labelObj (type, classVar, name, socket, message){ //Creates a new label
 }
 
 //handling socket connections
-io.on('connection', function(socket){
+io.on('connection', socket => {
   function getUserName(){ //returns the username searching by the socket.id
     return usersArray[arrayParser(socket.id, "socketId")].name;
   }
@@ -57,19 +57,18 @@ io.on('connection', function(socket){
   }
 
   socket.on('message', msgObj => { //normal message
-    console.log('ID ' + getUserName() + ': ' + msgObj.message);
     let label = new labelObj('received', 'normal-msg-received', getUserName(), socket.id, msgObj.message);
     socket.broadcast.emit('message', label);
   });
   socket.on('newConnection', data => { //when new connection
     newUser();
     console.log(getUserName() + ' connected');
-    let label = new labelObj('system', 'server-message-good', getUserName(), socket.id, 'connected');
+    let label = new labelObj('system', 'server-message-good', getUserName(), socket.id, 'Connected');
     socket.broadcast.emit('message', label);
   });
   socket.on('disconnect', () => { //when user disconnects
     console.log(getUserName() + ' has Disconnected');
-    let label = new labelObj('system', 'server-message-bad', getUserName(), socket.id, 'disconnected');
+    let label = new labelObj('system', 'server-message-bad', getUserName(), socket.id, 'Disconnected');
     usersArray.splice(arrayParser(socket.id, "socketId"), 1); //removes the disconnected user from the array
     io.emit('message', label);
   });
@@ -97,7 +96,6 @@ io.on('connection', function(socket){
   });
 });
 
-http.listen(port, function(){ //the http server will be listening to the specified port
+http.listen(port, () => { //the http server will be listening to the specified port
   console.log('Listening on *:3000'); //this message will be shown @console
-
 });

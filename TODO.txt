@@ -1,6 +1,7 @@
 - Add “{user} is typing” functionality (only for the tracked users)
 - Show who’s online
-- Give it a nice look
+- when a private message is sent, show who it was to.
+- inform everybody that someone changed the name
 - Other stuff:
   - Show a message when server is disconnected
-  - After limiting the message maxlenght, implement SPAM control
+  - implement SPAM control

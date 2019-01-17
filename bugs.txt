@@ -1,2 +1,1 @@
-1 - System messages are badly structured: check clientObj.labelParser case 'system'
-2 - "enabled-options" elements needs to be spaced from eachother
+1 -   remove the user from to-fix when he disconnects
