@@ -1,12 +1,13 @@
 {
     "name": "WebChat",
-    "version": "0.4.0",
-    "description": "Easy private webchat with file transfer",
+    "version": "1.0.0",
+    "description": "A simple Webchat with a few functionalities",
     "main": "index.js",
     "author": "tainanreis",
-    "email": "tainanreis@yahoo.com",
+    "email": "tainanreis@gmail.com",
     "dependencies": {
         "express": "^4.14.0",
+        "npm": "^6.4.1",
         "socket.io": "^1.4.8"
-      }
+    }
 }

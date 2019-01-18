@@ -1,91 +1,103 @@
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
+/*Color scheme: #FEFFFE #F55D3E #320E3B #4C2A85 #6B7FD7*/
+@import url('https://fonts.googleapis.com/css?family=Saira');
+/* Structure */
 body {
-    font: 13px Helvetica, Arial;
-    height: 100%;
+  font: 1.3em 'Saira', Helvetica, Arial, Sans-Serif;
+  margin: 0 auto;
+  overflow: hidden;
+}
+.container {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+.messageboard {
+  background-color: #FEFFFE;
+  height: 80%;
+  width: 98%;
+  overflow: auto;
+  overflow-x: hidden;
+  word-break: break-all;
+  border: 2px solid #6B7FD7;
+  border-radius: .2em;
+  margin: 1%;
+  box-sizing: border-box;
+}
+.enabled-options {
+  background-color: #FEFFFE;
+  height: 5%;
+  width: 98%;
+  margin: 0 1% 0 1%;
+  padding: 1% 0 1% 0;
+  display: flex;
+  flex-direction: row;
+  box-sizing: border-box;
+}
+.enabled-options label {
+  font-size: 70%;
+  margin-right: 2%;
+
+}
+.textarea {
+  background-color: #FEFFFE;
+  height: 15%;
+  width: 100%;
+  padding: 1%;
+  box-sizing: border-box;
+}
+#textarea {
+  background-color: #FEFFFE;
+  resize: none;
+  width: 100%;
+  height: 100%;
+  border: 2px solid #6B7FD7;
+  border-radius: .2em;
+  box-sizing: border-box;
+}
+:focus{ /*The textarea will always be on focus(), so we won't need this*/
+  outline: 0;
 }
 
-/*chat body*/
-ul {
-    list-style-type: none;
+/* Messages */
+/*applied to <p>*/
+p {
+  font-size: .8em;
+  line-height: 1.2em;
+  margin: .2em 0 .2em;
 }
-#container {
-    /* position: fixed; */
-    width: 100%;
-    max-height: 100%;
-    top: 0;
-}
-
-#messageboard {
-    position: fixed;
-    overflow: auto;
-    max-height: 88%;
-    width: 100%;
-    height: 100%; 
-    top: 0;
-}
-/*user input*/
-.panel.panel-default.user-input{
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    height: 10%;
-}
-#enabled-options {
-    border: 0;
-    height: 5%;
-    top: 0;
-}
-.panel.panel-default.user-input .panel-body{
-    width: 100%;
-    height: 100%;
-}
-#test-div-label {
-    border: 0;
-    height: 5%;
-    top: 0;
-}
-#message {
-    border: 0;
-    width: 90%;
-    height: 90%;
-    margin-right: .5%;
-    resize: none;
-}
-#test-button {
-    border: none;
-    width: 9%;
-    /* position: fixed; */
-}
-.server-message-good {
-    color: darkolivegreen;
-    font-size: 11px;
-    padding-left: 20px;
+/* applied to: <p> and <label>*/
+.server-message-good{
+    color: #6B7FD7;
+    font-size: 70%;
+    margin: 0;
 }
 .server-message-bad {
-    color: firebrick;
-    font-size: 11px;
-    padding-left: 20px;
+    color: #F55D3E;
+    font-size: 70%;
+    margin: 0;
 }
-.pm-send{
-    color: green;
-    font-weight: bolder;
-    font-size: 14px;
+/*applied to: <label> */
+.messageboard label {
+  font-weight: bolder;
 }
-.pm-receive{
-    color: red;
-    font-weight: bold;
+label.pm-send{
+    color: #4C2A85;
+    margin-left: 1em;
 }
-.normal-msg-sent{
-    color: black;
-    font-weight: bolder;
-    font-size: 14px;
+label.pm-receive{
+    color: #4C2A85;
+    margin-left: 1em;
 }
-.normal-msg-received{
-    /*this the message everybody else receive when someone sends a message*/
-    color: black;
-    font-weight: bold;
+label.normal-msg-sent{
+    color: #0f0f0f;
+    margin-left: 1em;
 }
-#track-on {
-    background-color: dimgrey;
+label.normal-msg-received{
+  color: #0f0f0f;
+}
+.messageboard label.track-on{
+  color: #F55D3E;
+  margin-left: 1em;
 }
