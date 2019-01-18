@@ -36,7 +36,7 @@ function labelObj (type, classVar, name, socket, message){ //Creates a new label
 }
 
 //handling socket connections
-io.on('connection', socket => {
+io.on('connection', (socket) => {
   function getUserName(){ //returns the username searching by the socket.id
     return usersArray[arrayParser(socket.id, "socketId")].name;
   }
@@ -52,15 +52,14 @@ io.on('connection', socket => {
       let label = new labelObj('system', 'server-message-bad', '', '', `User ${entry} doesn't exist or is offline`);
       io.to(socket.id).emit('message', label);
     } else {
-        return true;
+      return true;
     }
   }
-
-  socket.on('message', msgObj => { //normal message
+  socket.on('message', (msgObj) => { //normal message
     let label = new labelObj('received', 'normal-msg-received', getUserName(), socket.id, msgObj.message);
     socket.broadcast.emit('message', label);
   });
-  socket.on('newConnection', data => { //when new connection
+  socket.on('newConnection', (data) => { //when new connection
     newUser();
     console.log(getUserName() + ' connected');
     let label = new labelObj('system', 'server-message-good', getUserName(), socket.id, 'Connected');
@@ -72,19 +71,19 @@ io.on('connection', socket => {
     usersArray.splice(arrayParser(socket.id, "socketId"), 1); //removes the disconnected user from the array
     io.emit('message', label);
   });
-  socket.on('privateMessage', msgObj => { //private messages
+  socket.on('privateMessage', (msgObj) => { //private messages
     if(confirmUser(msgObj.socketId, "socketId")){
       let label = new labelObj('received', 'pm-receive', getUserName(), socket.id, msgObj.message);
       io.to(msgObj.socketId).emit('message', label);
     }
   });
-  socket.on('confirmUser', functionObj => { //returns a confirmation
+  socket.on('confirmUser', (functionObj) => { //returns a confirmation
     if(confirmUser(functionObj.user, "name")){ //if true, i.e., if user exists
       functionObj.socketId = getUserSocket(functionObj.user); //adds a new entry to the functionObj. The user respective socket will be needed @eventClient
       io.to(socket.id).emit('confirmedUser', functionObj); //returns the obj to the client so it can complete the request
     }
   });
-  socket.on('changeName', newName => { //changes the username
+  socket.on('changeName', (newName) => { //changes the username
     let label;
     if(arrayParser(newName, "name") < 0){ //if the same name is not found in the usersArray
       usersArray[arrayParser(socket.id, "socketId")].name = newName; //defines the new username
