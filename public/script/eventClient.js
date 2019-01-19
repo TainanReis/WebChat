@@ -59,7 +59,7 @@ window.addEventListener('load',function() {
           labelConstructor(socket, '', 'You: ', message, '');
           break;
         case 'received': //deals with the received messages
-          if(socket == clientObj.userSettings.track){ //if the user is tracking someone
+          if(socket == clientObj.userSettings.track.socketId){ //if the user is tracking someone
             labelConstructor(socket, '', `${name}: `, message, " track-on");
           } else {
             labelConstructor(socket, '', `${name}: `, message, '');
@@ -92,7 +92,7 @@ window.addEventListener('load',function() {
         let trackElements = function(){return Object.values(document.getElementsByName(socket))}; //returns an object with all the elements found
         trackElements().map((element) => element.setAttribute("class", element.getAttribute("class") + " track-on")); //run through each element and and another value to the "class" attribute
         clientObj.appendEnabledOptions("track-on", user);
-        clientObj.userSettings.track = socket; //defines the user socket to be tracked
+        clientObj.userSettings.track = {name: user, socketId: socket}; //defines the user socket to be tracked
       } else { //to disabled it
         let trackElements = function(){return Object.values(messageBoardElement.getElementsByTagName("label"))};
         trackElements().map((element) => { //run through each element and replaces " track-on" (with the space) with '' (nothing)
@@ -108,10 +108,11 @@ window.addEventListener('load',function() {
         let commandArray = msg.split(' '); // example: \to user msg > [\to,user,msg] > [1] = user ... [0] = \to
         clientObj.commandList(commandArray, msg); //parse the command
       } else { //if it's not a command, it's a normal message
-        if(clientObj.userSettings.toFix !== ''){ //if there's a to-fix user defined
+        if(clientObj.userSettings.toFix){ //if there's a to-fix user defined
           var msgObj = {
             message: msg,
-            socketId: clientObj.userSettings.toFix
+            user: clientObj.userSettings.toFix.name,
+            socketId: clientObj.userSettings.toFix.socketId
           };
           clientObj.labelParser('sent', 'pm-send', '', socket.id, msgObj.message);
           socket.emit('privateMessage', msgObj);
@@ -293,20 +294,33 @@ window.addEventListener('load',function() {
           socket.emit('privateMessage', functionObj);
           break;
         case 'to-fix':
-          if(clientObj.userSettings.toFix !== '') { //if it's already defined _
+          if(clientObj.userSettings.toFix) { //if it's already defined _
             clientObj.removeEnabledOptions('to-fix'); //_remove the already existent label. For now, "to-fix" only allows 1 user defined
           }
-          clientObj.userSettings.toFix = functionObj.socketId; //update it's valuewith the new username
+          clientObj.userSettings.toFix = {name: functionObj.user, socketId: functionObj.socketId}; //update it's valuewith the new username
           clientObj.appendEnabledOptions(functionObj.functionType, functionObj.user); //appends the new label
           break;
         case 'track':
-          if(clientObj.userSettings.track !== ''){ //if the user is already tracking someone it calls the function bellow. Doing this conditional statement, the function bellow only runs when needed, avoiding unnecessary work
+          if(clientObj.userSettings.track){ //if the user is already tracking someone it calls the function bellow. Doing this conditional statement, the function bellow only runs when needed, avoiding unnecessary work
             clientObj.trackFunction("off", '', ''); //This function will take off the track-on value from the labels class and removes the appended-option.
           }
           clientObj.trackFunction("on", functionObj.user, functionObj.socketId); //enables the tracking
           break;
         default:
           clientObj.labelParser('system', 'server-message-bad', '', '','error: eventClient>socketOn>confirmedUser');
+      }
+    });
+
+    socket.on('updateLabels', (userObj) => { //When someone changes the name, this updates the name @the labels
+      let updateMessageBoardLabels = function(){return Object.values(document.getElementsByName(userObj.socketId))};
+      updateMessageBoardLabels().map((element) => element.textContent = `${userObj.name}: `);
+      if(clientObj.userSettings.track.socketId === userObj.socketId){
+        clientObj.userSettings.track.name = userObj.name;
+        (enabledOptionsElement.getElementsByClassName("track-on")[0]).textContent = `track-on: ${userObj.name}`;
+      }
+      if(clientObj.userSettings.toFix.socketId === userObj.socketId){
+        clientObj.userSettings.toFix.name = userObj.name;
+        (enabledOptionsElement.getElementsByClassName("to-fix")[0]).textContent = `to-fix: ${userObj.name}`;
       }
     });
 

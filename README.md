@@ -1,4 +1,4 @@
-# WebChat V1.0
+# WebChat V1.1
 ## Information
 ### What is this?
 This project is a simple browser based chat made with Javascript (and CSS for styling) and uses the following technologies: Node.js, express.js, socket.io.
@@ -39,14 +39,15 @@ I'll keep adding new functionalities that I believe it's useful for a webchat.
 
 ## TODO:
 ### More important:
-- [ ] Correct bugs (see bugs.txt)
+- [X] Correct bugs (see bugs.txt)
 - [ ] When a private message is sent, show who it was to.
-- [ ] Inform everybody when someone changed the name
+- [X] Inform everybody when someone changed the name
 - [ ] Allow the messages to be copied
 - [ ] Show who’s online
 - [ ] Show a message when the connection is lost
 - [ ] Display `\help`
 - [ ] Implement SPAM control
+- [X] Update labels value when the specified user changes name
 ### Less important:
 - [ ] Disable enabled-options by double-clicking them
 - [ ] Allow tracking an user by double-clicking his name
@@ -57,4 +58,4 @@ I'll keep adding new functionalities that I believe it's useful for a webchat.
 - [ ] Enable/Disable autoscroll according to the scroll position.
 - [ ] Add file transfer support
 - [ ] Hyperlinks
-- [ ] Instead of groups, configure express routes to create a new chatroom from the link, e.g., `ip:3000\chatroom` 
+- [ ] Instead of groups, configure express routes to create a new chatroom from the link, e.g., `ip:3000\chatroom`
