@@ -41,7 +41,7 @@ I'll keep adding new functionalities that I believe it's useful for a webchat.
 ### More important:
 - [X] Correct bugs (see bugs.txt)
 - [ ] When a private message is sent, show who it was to.
-- [ ] Inform everybody when someone changed the name
+- [X] Inform everybody when someone changed the name
 - [ ] Allow the messages to be copied
 - [ ] Show who’s online
 - [ ] Show a message when the connection is lost

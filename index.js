@@ -72,7 +72,7 @@ io.on('connection', (socket) => {
     io.emit('message', label);
   });
   socket.on('privateMessage', (msgObj) => { //private messages
-    if(confirmUser(msgObj.socketId, "socketId", msgObj.user)){ //I had to add another argument because of this. Otherwise if the user wasn't found, it would return an erro message with the socket. 
+    if(confirmUser(msgObj.socketId, "socketId", msgObj.user)){ //I had to add another argument because of this. Otherwise if the user wasn't found, it would return an erro message with the socket.
       let label = new labelObj('received', 'pm-receive', getUserName(), socket.id, msgObj.message);
       io.to(msgObj.socketId).emit('message', label);
     }
@@ -84,9 +84,12 @@ io.on('connection', (socket) => {
     }
   });
   socket.on('changeName', (newName) => { //changes the username
-    let label;
+    let label,
+    username = getUserName();
     if(arrayParser(newName, "name") < 0){ //if the same name is not found in the usersArray
       usersArray[arrayParser(socket.id, "socketId")].name = newName; //defines the new username
+      label = new labelObj('system', 'server-message-good', '', '', `"${username}" is now: "${newName}"`);
+      socket.broadcast.emit('message', label);
       label = new labelObj('system', 'server-message-good', '', '', `Your new username: "${newName}"`);
     } else {
       label = new labelObj('system', 'server-message-bad', '', '', `Username "${newName}" already taken`);
