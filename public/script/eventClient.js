@@ -92,7 +92,7 @@ window.addEventListener('load',function() {
         let trackElements = function(){return Object.values(document.getElementsByName(socket))}; //returns an object with all the elements found
         trackElements().map((element) => element.setAttribute("class", element.getAttribute("class") + " track-on")); //run through each element and and another value to the "class" attribute
         clientObj.appendEnabledOptions("track-on", user);
-        clientObj.userSettings.track = {name: user,socketId: socket}; //defines the user socket to be tracked
+        clientObj.userSettings.track = {name: user, socketId: socket}; //defines the user socket to be tracked
       } else { //to disabled it
         let trackElements = function(){return Object.values(messageBoardElement.getElementsByTagName("label"))};
         trackElements().map((element) => { //run through each element and replaces " track-on" (with the space) with '' (nothing)
@@ -308,6 +308,19 @@ window.addEventListener('load',function() {
           break;
         default:
           clientObj.labelParser('system', 'server-message-bad', '', '','error: eventClient>socketOn>confirmedUser');
+      }
+    });
+
+    socket.on('updateLabels', (userObj) => { //When someone changes the name, this updates the name @the labels
+      let updateMessageBoardLabels = function(){return Object.values(document.getElementsByName(userObj.socketId))};
+      updateMessageBoardLabels().map((element) => element.textContent = `${userObj.name}: `);
+      if(clientObj.userSettings.track.socketId === userObj.socketId){
+        clientObj.userSettings.track.name = userObj.name;
+        (enabledOptionsElement.getElementsByClassName("track-on")[0]).textContent = `track-on: ${userObj.name}`;
+      }
+      if(clientObj.userSettings.toFix.socketId === userObj.socketId){
+        clientObj.userSettings.toFix.name = userObj.name;
+        (enabledOptionsElement.getElementsByClassName("to-fix")[0]).textContent = `to-fix: ${userObj.name}`;
       }
     });
 

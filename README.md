@@ -47,6 +47,7 @@ I'll keep adding new functionalities that I believe it's useful for a webchat.
 - [ ] Show a message when the connection is lost
 - [ ] Display `\help`
 - [ ] Implement SPAM control
+- [X] Update labels value when the specified user changes name
 ### Less important:
 - [ ] Disable enabled-options by double-clicking them
 - [ ] Allow tracking an user by double-clicking his name

@@ -85,12 +85,15 @@ io.on('connection', (socket) => {
   });
   socket.on('changeName', (newName) => { //changes the username
     let label,
-    username = getUserName();
+      username = getUserName(),
+      userObj;
     if(arrayParser(newName, "name") < 0){ //if the same name is not found in the usersArray
       usersArray[arrayParser(socket.id, "socketId")].name = newName; //defines the new username
       label = new labelObj('system', 'server-message-good', '', '', `"${username}" is now: "${newName}"`);
       socket.broadcast.emit('message', label);
       label = new labelObj('system', 'server-message-good', '', '', `Your new username: "${newName}"`);
+      userObj = {name: newName, socketId: socket.id};
+      socket.broadcast.emit('updateLabels', userObj); //to update the names @.enabled-options
     } else {
       label = new labelObj('system', 'server-message-bad', '', '', `Username "${newName}" already taken`);
     }
