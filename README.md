@@ -1,4 +1,4 @@
-# WebChat V1.0
+# WebChat V1.1
 ## Information
 ### What is this?
 This project is a simple browser based chat made with Javascript (and CSS for styling) and uses the following technologies: Node.js, express.js, socket.io.
