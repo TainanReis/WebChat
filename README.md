@@ -39,7 +39,7 @@ I'll keep adding new functionalities that I believe it's useful for a webchat.
 
 ## TODO:
 ### More important:
-- [ ] Correct bugs (see bugs.txt)
+- [X] Correct bugs (see bugs.txt)
 - [ ] When a private message is sent, show who it was to.
 - [ ] Inform everybody when someone changed the name
 - [ ] Allow the messages to be copied
@@ -57,4 +57,4 @@ I'll keep adding new functionalities that I believe it's useful for a webchat.
 - [ ] Enable/Disable autoscroll according to the scroll position.
 - [ ] Add file transfer support
 - [ ] Hyperlinks
-- [ ] Instead of groups, configure express routes to create a new chatroom from the link, e.g., `ip:3000\chatroom` 
+- [ ] Instead of groups, configure express routes to create a new chatroom from the link, e.g., `ip:3000\chatroom`

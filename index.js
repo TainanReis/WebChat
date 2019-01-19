@@ -47,9 +47,9 @@ io.on('connection', (socket) => {
     let userObj = {"socketId": socket.id, "name": predefinedUserName++ /*usersArray.length*/}; //the object to be moved
     usersArray.push(userObj); //move it!
   }
-  function confirmUser(entry, type){ //checks if the user is on the array type="name" || "socketId"
+  function confirmUser(entry, type, user){ //checks if the user is on the array type="name" || "socketId"
     if(arrayParser(entry, type) < 0){ //if the user is not found, sends an error message
-      let label = new labelObj('system', 'server-message-bad', '', '', `User ${entry} doesn't exist or is offline`);
+      let label = new labelObj('system', 'server-message-bad', '', '', `User ${user} doesn't exist or is offline`);
       io.to(socket.id).emit('message', label);
     } else {
       return true;
@@ -72,13 +72,13 @@ io.on('connection', (socket) => {
     io.emit('message', label);
   });
   socket.on('privateMessage', (msgObj) => { //private messages
-    if(confirmUser(msgObj.socketId, "socketId")){
+    if(confirmUser(msgObj.socketId, "socketId", msgObj.user)){ //I had to add another argument because of this. Otherwise if the user wasn't found, it would return an erro message with the socket. 
       let label = new labelObj('received', 'pm-receive', getUserName(), socket.id, msgObj.message);
       io.to(msgObj.socketId).emit('message', label);
     }
   });
   socket.on('confirmUser', (functionObj) => { //returns a confirmation
-    if(confirmUser(functionObj.user, "name")){ //if true, i.e., if user exists
+    if(confirmUser(functionObj.user, "name", functionObj.user)){ //if true, i.e., if user exists
       functionObj.socketId = getUserSocket(functionObj.user); //adds a new entry to the functionObj. The user respective socket will be needed @eventClient
       io.to(socket.id).emit('confirmedUser', functionObj); //returns the obj to the client so it can complete the request
     }
